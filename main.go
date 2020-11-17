@@ -1,14 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+	"fmt"
 
+	"github.com/taniwhy/ithub-backend/db/dao"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	fmt.Println("helloworld")
+	dbConn := dao.NewDatabase()
+	defer dbConn.Close()
+	
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
