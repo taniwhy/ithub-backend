@@ -7,6 +7,8 @@ services:
     container_name: "app"
     ports:
       - "8000:8000"
+    environment:
+      GO_ENV: dev
     tty: true
     depends_on:
       - db

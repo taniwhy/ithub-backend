@@ -15,3 +15,6 @@ WORKDIR /go/src/github.com/taniwhy/ithub-backend
 ADD . /go/src/github.com/taniwhy/ithub-backend
 
 EXPOSE 8000
+
+CMD go run main.go
+
