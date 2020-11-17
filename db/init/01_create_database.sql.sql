@@ -1,0 +1,6 @@
+
+DROP DATABASE IF EXISTS ithub;
+
+CREATE DATABASE ithub;
+
+ALTER DATABASE ithub SET timezone TO 'Asia/Tokyo';

@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"fmt"
 
 	"github.com/taniwhy/ithub-backend/db/dao"
 	"github.com/gin-gonic/gin"
