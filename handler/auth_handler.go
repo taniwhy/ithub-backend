@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/taniwhy/ithub-backend/domain/model"
+	"github.com/taniwhy/ithub-backend/domain/service"
 )
 
 const googleURL string = "https://www.googleapis.com/oauth2/v1/userinfo"
@@ -19,11 +20,13 @@ type IAuthHandler interface {
 	Login(c *gin.Context)
 }
 
-type authHandler struct{}
+type authHandler struct {
+	userService service.IUserService
+}
 
 // NewAuthHandler : GoogleOAuth認証ハンドラの生成
-func NewAuthHandler() IAuthHandler {
-	return &authHandler{}
+func NewAuthHandler(uS service.IUserService) IAuthHandler {
+	return &authHandler{userService: uS}
 }
 
 type loginReqBody struct {
@@ -53,7 +56,7 @@ func (e ErrInvalidToken) Error() string {
 	return fmt.Sprintf("this token is invalid! - " + e.IDToken)
 }
 
-func (aH *authHandler) Login(c *gin.Context) {
+func (h *authHandler) Login(c *gin.Context) {
 	reqBody := &loginReqBody{}
 	if err := c.Bind(reqBody); err != nil {
 		ErrorResponser(c, http.StatusBadRequest, ErrLoginReqBinding{IDToken: reqBody.IDToken}.Error())
@@ -77,5 +80,15 @@ func (aH *authHandler) Login(c *gin.Context) {
 		log.Fatal(err)
 		ErrorResponser(c, http.StatusBadRequest, "googleAPI response binding error")
 	}
-	SuccessResponser(c, gU)
+	ok, err := h.userService.IsExist(gU.ID)
+	if err != nil {
+		ErrorResponser(c, http.StatusBadRequest, err.Error())
+	}
+	if !ok {
+		// ログイン
+	}
+	// 新規登録
+	// 前に削除したユーザーのアカウント復旧処理が必要
+	newUser := model.NewUser(gU.ID, gU.Name, gU.Picture, gU.Email)
+	SuccessResponser(c, newUser)
 }
