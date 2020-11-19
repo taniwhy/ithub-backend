@@ -6,7 +6,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// SignBytes : 秘密鍵
+var SignBytes string
+
 func init() {
+	SignBytes = os.Getenv("AUTHORIZE_RSA")
 	switch os.Getenv("GO_ENV") {
 	case "dev":
 		err := godotenv.Load("./config/env/.env.dev")

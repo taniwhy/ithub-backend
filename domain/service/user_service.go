@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/taniwhy/ithub-backend/domain/repository"
 )
 
@@ -36,6 +37,9 @@ func (s *userService) IsAdmin(id string) (bool, error) {
 // ユーザーが存在しなければtrueを返却
 func (s *userService) IsExist(id string) (bool, error) {
 	res, err := s.userRepository.FindByID(id)
+	if gorm.IsRecordNotFoundError(err) {
+		return true, nil
+	}
 	if err != nil {
 		return false, err
 	}

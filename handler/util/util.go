@@ -1,4 +1,4 @@
-package handler
+package util
 
 import (
 	"net/http"
@@ -13,7 +13,6 @@ func SuccessResponser(c *gin.Context, data interface{}) {
 		"status": http.StatusText(http.StatusOK),
 		"data":   data,
 	})
-	return
 }
 
 // ErrorResponser : エラーレスポンス生成とレスポンス実行
@@ -23,5 +22,4 @@ func ErrorResponser(c *gin.Context, code int, message string) {
 		"status":  http.StatusText(code),
 		"message": message,
 	})
-	return
 }

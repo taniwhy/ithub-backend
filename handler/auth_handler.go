@@ -2,15 +2,18 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/taniwhy/ithub-backend/domain/model"
+	"github.com/taniwhy/ithub-backend/domain/repository"
 	"github.com/taniwhy/ithub-backend/domain/service"
+	"github.com/taniwhy/ithub-backend/handler/errors"
+	"github.com/taniwhy/ithub-backend/handler/util"
+	"github.com/taniwhy/ithub-backend/middleware/auth"
 )
 
 const googleURL string = "https://www.googleapis.com/oauth2/v1/userinfo"
@@ -18,77 +21,91 @@ const googleURL string = "https://www.googleapis.com/oauth2/v1/userinfo"
 // IAuthHandler : インターフェース
 type IAuthHandler interface {
 	Login(c *gin.Context)
+	Logout(c *gin.Context)
 }
 
 type authHandler struct {
-	userService service.IUserService
+	userRepository repository.IUserRepository
+	userService    service.IUserService
 }
 
 // NewAuthHandler : GoogleOAuth認証ハンドラの生成
-func NewAuthHandler(uS service.IUserService) IAuthHandler {
-	return &authHandler{userService: uS}
+func NewAuthHandler(uR repository.IUserRepository, uS service.IUserService) IAuthHandler {
+	return &authHandler{userRepository: uR, userService: uS}
 }
 
 type loginReqBody struct {
 	IDToken string `json:"id_token" binding:"required"`
 }
 
-// ErrLoginReqBinding : TODO
-type ErrLoginReqBinding struct {
-	IDToken string
-}
-
-func (e ErrLoginReqBinding) Error() string {
-	var errMsg []string
-	if e.IDToken == "" {
-		errMsg = append(errMsg, "id_token")
-	}
-	errMsgs := strings.Join(errMsg, ", ")
-	return fmt.Sprintf("Binding error! - " + errMsgs + " is required")
-}
-
-// ErrInvalidToken : TODO
-type ErrInvalidToken struct {
-	IDToken string
-}
-
-func (e ErrInvalidToken) Error() string {
-	return fmt.Sprintf("this token is invalid! - " + e.IDToken)
-}
-
 func (h *authHandler) Login(c *gin.Context) {
 	reqBody := &loginReqBody{}
 	if err := c.Bind(reqBody); err != nil {
-		ErrorResponser(c, http.StatusBadRequest, ErrLoginReqBinding{IDToken: reqBody.IDToken}.Error())
+		util.ErrorResponser(c, http.StatusBadRequest, errors.ErrLoginReqBinding{IDToken: reqBody.IDToken}.Error())
+		return
 	}
 	resp, err := http.Get(googleURL + "?access_token=" + reqBody.IDToken)
 	if err != nil {
 		log.Fatal(err)
-		ErrorResponser(c, http.StatusBadRequest, "googleAPI access error")
+		util.ErrorResponser(c, http.StatusBadRequest, "googleAPI access error")
+		return
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		ErrorResponser(c, http.StatusBadRequest, ErrInvalidToken{IDToken: reqBody.IDToken}.Error())
+		util.ErrorResponser(c, http.StatusBadRequest, errors.ErrInvalidToken{IDToken: reqBody.IDToken}.Error())
+		return
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
-		ErrorResponser(c, http.StatusBadRequest, "googleAPI response read error")
+		util.ErrorResponser(c, http.StatusBadRequest, "googleAPI response read error")
+		return
 	}
 	gU := model.GoogleUser{}
 	if err := json.Unmarshal(body, &gU); err != nil {
 		log.Fatal(err)
-		ErrorResponser(c, http.StatusBadRequest, "googleAPI response binding error")
+		util.ErrorResponser(c, http.StatusBadRequest, "googleAPI response binding error")
+		return
 	}
 	ok, err := h.userService.IsExist(gU.ID)
 	if err != nil {
-		ErrorResponser(c, http.StatusBadRequest, err.Error())
+		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
 	}
 	if !ok {
 		// ログイン
+		u, err := h.userRepository.FindByID(gU.ID)
+		if err != nil {
+			util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+			return
+		}
+		accessToken := auth.GenerateAccessToken(u.UserName.String, u.IsAdmin)
+		util.SuccessResponser(c, accessToken)
+		return
 	}
 	// 新規登録
-	// 前に削除したユーザーのアカウント復旧処理が必要
+	// 前に削除したユーザーのアカウント復旧処理が必要]
+
 	newUser := model.NewUser(gU.ID, gU.Name, gU.Picture, gU.Email)
-	SuccessResponser(c, newUser)
+	if err := h.userRepository.Insert(newUser); err != nil {
+		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	u, err := h.userRepository.FindByID(gU.ID)
+	if err != nil {
+		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	accessToken := auth.GenerateAccessToken(u.UserName.String, u.IsAdmin)
+	session := sessions.Default(c)
+	session.Set("state", accessToken)
+	session.Save()
+	util.SuccessResponser(c, accessToken)
+}
+
+func (h *authHandler) Logout(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
+	session.Save()
+	util.SuccessResponser(c, "logout")
 }
