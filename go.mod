@@ -12,6 +12,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/rubenv/sql-migrate v0.0.0-20200616145509-8d140a17f351 // indirect
 	github.com/ugorji/go v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20201117144127-c1f2f97bffc9 // indirect
 	golang.org/x/sys v0.0.0-20201117222635-ba5294a509c7 // indirect
