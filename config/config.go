@@ -10,7 +10,6 @@ import (
 var SignBytes string
 
 func init() {
-	SignBytes = os.Getenv("AUTHORIZE_RSA")
 	switch os.Getenv("GO_ENV") {
 	case "dev":
 		err := godotenv.Load("./config/env/.env.dev")
@@ -19,6 +18,7 @@ func init() {
 		}
 	default:
 	}
+	SignBytes = os.Getenv("AUTHORIZE_RSA")
 }
 
 // GetDatabaseConf :　データベースの接続情報の取得

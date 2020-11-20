@@ -9,5 +9,4 @@ type IUserRepository interface {
 	Insert(user *model.User) error
 	Update(user *model.User) error
 	Delete(userName string) error
-	Restore(userName string) error
 }
