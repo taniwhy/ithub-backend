@@ -7,8 +7,8 @@ import (
 	"github.com/taniwhy/ithub-backend/util/clock"
 )
 
-// Note_Tag :
-type Note_Tag struct {
+// NoteTag :
+type NoteTag struct {
 	NoteID    string
 	TagID     string
 	TagName   string
@@ -17,8 +17,8 @@ type Note_Tag struct {
 }
 
 // NewNote_Tag : Tagテーブルのレコードモデル生成
-func NewNote_Tag(nID, tID string) *Note_Tag {
-	return &Note_Tag{
+func NewNoteTag(nID, tID string) *NoteTag {
+	return &NoteTag{
 		NoteID:    nID,
 		TagID:     tID,
 		IsMain:    false,
