@@ -1,6 +1,6 @@
 development:
   dialect: postgres
-  datasource: "dbname=ithub host=db user=postgres password=postgres port=5432 sslmode=disable"
+  datasource: ${DB_URL}
   dir: db/migrations
   table: migrations
 

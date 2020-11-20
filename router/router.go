@@ -19,11 +19,11 @@ func Init(dbConn *gorm.DB) *gin.Engine {
 	userDatastore := datastore.NewUserDatastore(dbConn)
 	userService := service.NewUserService(userDatastore)
 	authHandler := handler.NewAuthHandler(userDatastore, userService)
-	userHandler := handler.NewUserHandler()
+	userHandler := handler.NewUserHandler(userDatastore)
 
 	r := gin.Default()
 	store := cookie.NewStore([]byte(config.SignBytes))
-	r.Use(sessions.Sessions("session", store))
+	r.Use(sessions.Sessions("_session", store))
 	r.Use(cors.Write())
 
 	v1 := r.Group("/v1")
@@ -32,16 +32,16 @@ func Init(dbConn *gorm.DB) *gin.Engine {
 	{
 		v1.GET("/", func(c *gin.Context) {
 			session := sessions.Default(c)
-			c.JSON(200, gin.H{"message": session.Get("state")})
+			c.JSON(200, gin.H{"message": session.Get("token")})
 		})
 		auth.POST("/google/login", authHandler.Login)
 		auth.DELETE("/logout", authHandler.Logout)
 		auth.POST("/reflesh")
 
 		v1.GET("/me", userHandler.GetMe)
-		users.GET("/:id", userHandler.GetByID)
-		users.PUT("", userHandler.Update)
-		users.DELETE("", userHandler.Delete)
+		users.GET("/:name", userHandler.GetByUserName)
+		users.PUT("/", userHandler.Update)
+		users.DELETE("/", userHandler.Delete)
 	}
 	return r
 }

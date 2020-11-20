@@ -9,6 +9,7 @@ import (
 type IUserService interface {
 	IsAdmin(id string) (bool, error)
 	IsExist(id string) (bool, error)
+	IsDeleted(id string) (bool, error)
 }
 
 type userService struct {
@@ -47,4 +48,19 @@ func (s *userService) IsExist(id string) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+// ユーザーが削除済みであればtrueを返却
+func (s *userService) IsDeleted(id string) (bool, error) {
+	res, err := s.userRepository.FindByID(id)
+	if gorm.IsRecordNotFoundError(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	if res != nil && res.DeletedAt.Valid == true {
+		return true, nil
+	}
+	return false, nil
 }

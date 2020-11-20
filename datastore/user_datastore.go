@@ -48,7 +48,7 @@ func (d *userDatastore) Insert(user *model.User) error {
 }
 
 func (d *userDatastore) Update(user *model.User) error {
-	return d.db.Updates(user).Error
+	return d.db.Save(user).Error
 }
 
 func (d *userDatastore) Delete(userName string) error {
@@ -56,6 +56,20 @@ func (d *userDatastore) Delete(userName string) error {
 	err := d.db.
 		Model(&user).Where("user_name = ?", userName).
 		Update("deleted_at", sql.NullTime{Time: clock.Now(), Valid: true}).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return errors.ErrRecordNotFound{}
+	}
+	if err != nil {
+		return errors.ErrDatabase{Detail: err.Error()}
+	}
+	return nil
+}
+
+func (d *userDatastore) Restore(userName string) error {
+	user := model.User{}
+	err := d.db.
+		Model(&user).Where("user_name = ?", userName).
+		Update("deleted_at", sql.NullTime{Valid: false}).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return errors.ErrRecordNotFound{}
 	}

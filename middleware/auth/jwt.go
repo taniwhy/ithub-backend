@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -26,8 +27,12 @@ func GenerateAccessToken(userID string, isAdmin bool) string {
 
 // GetTokenClaimsFromToken : トークンからトークンClaimを取得
 func GetTokenClaimsFromToken(tokenString string) (jwt.MapClaims, error) {
+	fmt.Println(tokenString)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return config.SignBytes, nil
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return "", fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(config.SignBytes), nil
 	})
 	if err != nil {
 		return nil, err
