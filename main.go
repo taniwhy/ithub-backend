@@ -12,7 +12,6 @@ import (
 
 func main() {
 	dbConn := dao.NewDatabase()
-
 	defer dbConn.Close()
 
 	routers := router.Init(dbConn)

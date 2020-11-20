@@ -1,22 +1,25 @@
 package handler
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/taniwhy/ithub-backend/domain/model"
 	"github.com/taniwhy/ithub-backend/domain/repository"
+	"github.com/taniwhy/ithub-backend/handler/errors"
 	"github.com/taniwhy/ithub-backend/handler/json"
 	"github.com/taniwhy/ithub-backend/handler/util"
 	"github.com/taniwhy/ithub-backend/middleware/auth"
+	"github.com/taniwhy/ithub-backend/util/clock"
 	"gopkg.in/guregu/null.v3"
 )
 
-// IUserHandler : インターフェース
+// IUserHandler : ユーザーハンドラのインターフェース
 type IUserHandler interface {
 	GetMe(c *gin.Context)
-	GetByUserName(c *gin.Context)
+	GetByName(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
 }
@@ -30,19 +33,22 @@ func NewUserHandler(uR repository.IUserRepository) IUserHandler {
 	return &userHandler{userRepository: uR}
 }
 
+// GetMe : GetMe関数は自ユーザー情報を取得しレスポンスを返却します
 func (h *userHandler) GetMe(c *gin.Context) {
 	session := sessions.Default(c)
 	token := session.Get("_token")
 	claims, err := auth.GetTokenClaimsFromToken(token.(string))
 	if err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
 	}
 	userID := claims["sub"].(string)
 	user, err := h.userRepository.FindByID(userID)
 	if err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
 	}
-	util.SuccessResponser(
+	util.SuccessDataResponser(
 		c, json.GetUserResJSON{
 			User: json.UserJSON{
 				UserID:          user.UserID,
@@ -57,13 +63,15 @@ func (h *userHandler) GetMe(c *gin.Context) {
 		})
 }
 
-func (h *userHandler) GetByUserName(c *gin.Context) {
-	userName := c.Params.ByName("name")
-	user, err := h.userRepository.FindByUserName(userName)
+// GetByName : GetByName関数はユーザー情報を取得しレスポンスを返却します
+func (h *userHandler) GetByName(c *gin.Context) {
+	name := c.Params.ByName("name")
+	user, err := h.userRepository.FindByName(name)
 	if err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
 	}
-	util.SuccessResponser(
+	util.SuccessDataResponser(
 		c, json.GetUserResJSON{
 			User: json.UserJSON{
 				UserID:          user.UserID,
@@ -78,29 +86,50 @@ func (h *userHandler) GetByUserName(c *gin.Context) {
 		})
 }
 
+// Update : Update関数はユーザー情報を更新しレスポンスを返却します
 func (h *userHandler) Update(c *gin.Context) {
 	body := json.UpdateUserReqJSON{}
-	if err := c.BindJSON(&body); err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+	if err := c.ShouldBindJSON(&body); err != nil {
+		util.ErrorResponser(c, http.StatusBadRequest, errors.ErrUserUpdateReqBinding{Body: body}.Error())
+		return
 	}
 	session := sessions.Default(c)
 	token := session.Get("_token")
 	claims, err := auth.GetTokenClaimsFromToken(token.(string))
 	if err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
 	}
 	userID := claims["sub"].(string)
-	user, err := h.userRepository.FindByID(userID)
-	if err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
-	}
 	if err := h.userRepository.Update(&model.User{
-		UserID: user.UserID,
+		UserID:          userID,
+		UserName:        sql.NullString{String: body.UserName, Valid: body.UserName != ""},
+		Name:            body.Name,
+		TwitterUsername: sql.NullString{String: body.TwitterUsername.String, Valid: body.TwitterUsername.String != ""},
+		GithubUsername:  sql.NullString{String: body.GithubUsername.String, Valid: body.GithubUsername.String != ""},
+		UserText:        sql.NullString{String: body.UserText.String, Valid: body.UserText.String != ""},
+		UserIcon:        sql.NullString{String: body.UserIcon.String, Valid: body.UserIcon.String != ""},
+		UpdatedAt:       clock.Now(),
 	}); err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
 	}
+	util.SuccessMessageResponser(c, "ok")
 }
 
+// Delete : Delete関数はユーザー情報を削除しレスポンスを返却します
 func (h *userHandler) Delete(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+	session := sessions.Default(c)
+	token := session.Get("_token")
+	claims, err := auth.GetTokenClaimsFromToken(token.(string))
+	if err != nil {
+		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	userID := claims["sub"].(string)
+	if err := h.userRepository.Delete(userID); err != nil {
+		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.SuccessMessageResponser(c, "ok")
 }

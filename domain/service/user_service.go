@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 	"github.com/taniwhy/ithub-backend/domain/repository"
 )
@@ -52,15 +54,14 @@ func (s *userService) IsExist(id string) (bool, error) {
 
 // ユーザーが削除済みであればtrueを返却
 func (s *userService) IsDeleted(id string) (bool, error) {
-	res, err := s.userRepository.FindByID(id)
-	if gorm.IsRecordNotFoundError(err) {
-		return false, nil
+	res, err := s.userRepository.FindDeletedByID(id)
+	if res != nil && res.DeletedAt.Valid == true {
+		fmt.Println("test3")
+		return true, nil
 	}
 	if err != nil {
 		return false, err
 	}
-	if res != nil && res.DeletedAt.Valid == true {
-		return true, nil
-	}
+	fmt.Println("test4")
 	return false, nil
 }

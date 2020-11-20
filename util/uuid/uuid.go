@@ -4,7 +4,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// UuID : UUIDのグローバル変数
+// UuID : UUID
 var UuID = func() string {
 	uuid, err := uuid.NewRandom()
 	if err != nil {

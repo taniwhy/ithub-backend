@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -40,7 +41,7 @@ type loginReqBody struct {
 
 func (h *authHandler) Login(c *gin.Context) {
 	reqBody := &loginReqBody{}
-	if err := c.Bind(reqBody); err != nil {
+	if err := c.ShouldBindJSON(reqBody); err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, errors.ErrLoginReqBinding{IDToken: reqBody.IDToken}.Error())
 		return
 	}
@@ -80,11 +81,13 @@ func (h *authHandler) Login(c *gin.Context) {
 		}
 		if ok {
 			// アカウント復旧
+			fmt.Println("test")
 			if err := h.userRepository.Restore(gU.ID); err != nil {
 				util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 				return
 			}
 		} else {
+			fmt.Println("test2")
 			// 新規登録
 			newUser := model.NewUser(gU.ID, gU.Name, gU.Picture, gU.Email)
 			if err := h.userRepository.Insert(newUser); err != nil {
@@ -103,12 +106,12 @@ func (h *authHandler) Login(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Set("_token", accessToken)
 	session.Save()
-	util.SuccessResponser(c, accessToken)
+	util.SuccessMessageResponser(c, "ok")
 }
 
 func (h *authHandler) Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
-	util.SuccessResponser(c, "logout")
+	util.SuccessMessageResponser(c, "ok")
 }

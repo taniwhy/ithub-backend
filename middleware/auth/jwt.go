@@ -27,7 +27,6 @@ func GenerateAccessToken(userID string, isAdmin bool) string {
 
 // GetTokenClaimsFromToken : トークンからトークンClaimを取得
 func GetTokenClaimsFromToken(tokenString string) (jwt.MapClaims, error) {
-	fmt.Println(tokenString)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return "", fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
