@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/taniwhy/ithub-backend/util/clock"
+	"github.com/taniwhy/ithub-backend/util/uuid"
 )
 
 // Comment :
@@ -19,14 +20,14 @@ type Comment struct {
 }
 
 // NewComment : Commentテーブルのレコードモデル生成
-func NewComment(cID, gID, nID, comment string) *Comment {
+func NewComment(userID, noteID, comment string) *Comment {
 	return &Comment{
-		CommentID: cID,
-		UserID:    gID,
-		NoteID:    nID,
+		CommentID: uuid.UuID(),
+		UserID:    userID,
+		NoteID:    noteID,
 		Comment:   comment,
 		CreatedAt: clock.Now(),
 		UpdatedAt: clock.Now(),
-		DeletedAt: sql.NullTime{Time: clock.Now(), Valid: false},
+		DeletedAt: sql.NullTime{Valid: false},
 	}
 }

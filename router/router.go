@@ -42,6 +42,7 @@ func Init(dbConn *gorm.DB) *gin.Engine {
 		users.GET("/:name", userHandler.GetByName)
 		users.PUT("/", userHandler.Update)
 		users.DELETE("/", userHandler.Delete)
+
 	}
 	return r
 }

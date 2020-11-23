@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/taniwhy/ithub-backend/util/clock"
+	"github.com/taniwhy/ithub-backend/util/uuid"
 )
 
 // Tag :
@@ -18,13 +19,13 @@ type Tag struct {
 }
 
 // NewTag : Tagテーブルのレコードモデル生成
-func NewTag(tID, tagName string) *Tag {
+func NewTag(tagName, TagIcon string) *Tag {
 	return &Tag{
-		TagID:     tID,
+		TagID:     uuid.UuID(),
 		TagName:   tagName,
-		TagIcon:   sql.NullString{String: "", Valid: false},
+		TagIcon:   sql.NullString{String: TagIcon, Valid: TagIcon != ""},
 		CreatedAt: clock.Now(),
 		UpdatedAt: clock.Now(),
-		DeletedAt: sql.NullTime{Time: clock.Now(), Valid: false},
+		DeletedAt: sql.NullTime{Valid: false},
 	}
 }

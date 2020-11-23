@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/taniwhy/ithub-backend/util/clock"
+	"github.com/taniwhy/ithub-backend/util/uuid"
 )
 
 // Note :
@@ -19,14 +20,14 @@ type Note struct {
 }
 
 // NewNote : Noteテーブルのレコードモデル生成
-func NewNote(nID, uID, noteTitle, noteText string) *Note {
+func NewNote(userID, noteTitle, noteText string) *Note {
 	return &Note{
-		NoteID:    nID,
-		UserID:    uID,
+		NoteID:    uuid.UuID(),
+		UserID:    userID,
 		NoteTitle: noteTitle,
 		NoteText:  noteText,
 		CreatedAt: clock.Now(),
 		UpdatedAt: clock.Now(),
-		DeletedAt: sql.NullTime{Time: clock.Now(), Valid: false},
+		DeletedAt: sql.NullTime{Valid: false},
 	}
 }

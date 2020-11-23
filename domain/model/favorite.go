@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/taniwhy/ithub-backend/util/clock"
+	"github.com/taniwhy/ithub-backend/util/uuid"
 )
 
 // Favorite :
@@ -18,13 +19,13 @@ type Favorite struct {
 }
 
 // NewFavorite : Favoriteテーブルのレコードモデル生成
-func NewFavorite(favoID, uID, nID string) *Favorite {
+func NewFavorite(userID, noteID string) *Favorite {
 	return &Favorite{
-		FavoriteID: favoID,
-		UserID:     uID,
-		NoteID:     nID,
+		FavoriteID: uuid.UuID(),
+		UserID:     userID,
+		NoteID:     noteID,
 		CreatedAt:  clock.Now(),
 		UpdatedAt:  clock.Now(),
-		DeletedAt:  sql.NullTime{Time: clock.Now(), Valid: false},
+		DeletedAt:  sql.NullTime{Valid: false},
 	}
 }

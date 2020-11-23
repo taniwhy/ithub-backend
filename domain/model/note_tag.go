@@ -16,12 +16,12 @@ type NoteTag struct {
 	CreatedAt time.Time
 }
 
-// NewNote_Tag : Tagテーブルのレコードモデル生成
-func NewNoteTag(nID, tID string) *NoteTag {
+// NewNoteTag : NoteTagテーブルのレコードモデル生成
+func NewNoteTag(noteID, tagID string, isMain bool) *NoteTag {
 	return &NoteTag{
-		NoteID:    nID,
-		TagID:     tID,
-		IsMain:    false,
+		NoteID:    noteID,
+		TagID:     tagID,
+		IsMain:    isMain,
 		CreatedAt: clock.Now(),
 	}
 }

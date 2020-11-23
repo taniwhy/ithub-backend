@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/taniwhy/ithub-backend/util/clock"
+	"github.com/taniwhy/ithub-backend/util/uuid"
 )
 
 // Follow :
@@ -18,13 +19,13 @@ type Follow struct {
 }
 
 // NewFollow : Tagテーブルのレコードモデル生成
-func NewFollow(fID, uID, fouID string) *Follow {
+func NewFollow(userID, followUserID string) *Follow {
 	return &Follow{
-		FollowID:     fID,
-		UserID:       uID,
-		FollowUserID: fouID,
+		FollowID:     uuid.UuID(),
+		UserID:       userID,
+		FollowUserID: followUserID,
 		CreatedAt:    clock.Now(),
 		UpdatedAt:    clock.Now(),
-		DeletedAt:    sql.NullTime{Time: clock.Now(), Valid: false},
+		DeletedAt:    sql.NullTime{Valid: false},
 	}
 }
