@@ -1,7 +1,5 @@
-
 -- +migrate Up
-CREATE TABLE IF NOT EXISTS users
-(
+CREATE TABLE IF NOT EXISTS users (
     user_id TEXT NOT NULL,
     user_name TEXT,
     name TEXT NOT NULL,
@@ -16,5 +14,6 @@ CREATE TABLE IF NOT EXISTS users
     PRIMARY KEY(user_id),
     UNIQUE(user_id, email)
 );
+
 -- +migrate Down
 DROP TABLE IF EXISTS users;

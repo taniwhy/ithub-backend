@@ -40,7 +40,7 @@ type loginReqBody struct {
 
 func (h *authHandler) Login(c *gin.Context) {
 	reqBody := &loginReqBody{}
-	if err := c.Bind(reqBody); err != nil {
+	if err := c.ShouldBindJSON(reqBody); err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, errors.ErrLoginReqBinding{IDToken: reqBody.IDToken}.Error())
 		return
 	}
@@ -72,40 +72,43 @@ func (h *authHandler) Login(c *gin.Context) {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if !ok {
-		// ログイン
-		u, err := h.userRepository.FindByID(gU.ID)
+	if ok {
+		ok, err := h.userService.IsDeleted(gU.ID)
 		if err != nil {
 			util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 			return
 		}
-		accessToken := auth.GenerateAccessToken(u.UserName.String, u.IsAdmin)
-		util.SuccessResponser(c, accessToken)
-		return
+		if ok {
+			// アカウント復旧
+			if err := h.userRepository.Restore(gU.ID); err != nil {
+				util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+				return
+			}
+		} else {
+			// 新規登録
+			newUser := model.NewUser(gU.ID, gU.Name, gU.Picture, gU.Email)
+			if err := h.userRepository.Insert(newUser); err != nil {
+				util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 	}
-	// 新規登録
-	// 前に削除したユーザーのアカウント復旧処理が必要]
-
-	newUser := model.NewUser(gU.ID, gU.Name, gU.Picture, gU.Email)
-	if err := h.userRepository.Insert(newUser); err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
-		return
-	}
+	// ログイン
 	u, err := h.userRepository.FindByID(gU.ID)
 	if err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	accessToken := auth.GenerateAccessToken(u.UserName.String, u.IsAdmin)
+	accessToken := auth.GenerateAccessToken(u.UserID, u.IsAdmin)
 	session := sessions.Default(c)
-	session.Set("state", accessToken)
+	session.Set("_token", accessToken)
 	session.Save()
-	util.SuccessResponser(c, accessToken)
+	util.SuccessMessageResponser(c, "ok")
 }
 
 func (h *authHandler) Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
-	util.SuccessResponser(c, "logout")
+	util.SuccessMessageResponser(c, "ok")
 }

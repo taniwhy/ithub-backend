@@ -14,7 +14,8 @@ type User struct {
 	Name            string
 	TwitterUsername sql.NullString
 	GithubUsername  sql.NullString
-	UserIcon        string
+	UserText        sql.NullString
+	UserIcon        sql.NullString
 	Email           string
 	IsAdmin         bool
 	CreatedAt       time.Time
@@ -30,11 +31,12 @@ func NewUser(gID, name, icon, email string) *User {
 		Name:            name,
 		TwitterUsername: sql.NullString{String: "", Valid: false},
 		GithubUsername:  sql.NullString{String: "", Valid: false},
-		UserIcon:        icon,
+		UserText:        sql.NullString{String: "", Valid: false},
+		UserIcon:        sql.NullString{String: "", Valid: false},
 		Email:           email,
 		IsAdmin:         false,
 		CreatedAt:       clock.Now(),
 		UpdatedAt:       clock.Now(),
-		DeletedAt:       sql.NullTime{Time: clock.Now(), Valid: false},
+		DeletedAt:       sql.NullTime{Valid: false},
 	}
 }
