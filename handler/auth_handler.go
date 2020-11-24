@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -81,13 +80,11 @@ func (h *authHandler) Login(c *gin.Context) {
 		}
 		if ok {
 			// アカウント復旧
-			fmt.Println("test")
 			if err := h.userRepository.Restore(gU.ID); err != nil {
 				util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 				return
 			}
 		} else {
-			fmt.Println("test2")
 			// 新規登録
 			newUser := model.NewUser(gU.ID, gU.Name, gU.Picture, gU.Email)
 			if err := h.userRepository.Insert(newUser); err != nil {

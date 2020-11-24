@@ -2,7 +2,6 @@ package handler
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -98,7 +97,6 @@ func (h *userHandler) Update(c *gin.Context) {
 	token := session.Get("_token")
 	claims, err := auth.GetTokenClaimsFromToken(token.(string))
 	if err != nil {
-		fmt.Print("aa")
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
