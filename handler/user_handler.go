@@ -50,16 +50,14 @@ func (h *userHandler) GetMe(c *gin.Context) {
 	}
 	util.SuccessDataResponser(c,
 		json.GetUserResJSON{
-			User: json.UserJSON{
-				UserID:          user.UserID,
-				UserName:        null.NewString(user.UserName.String, user.UserName.Valid),
-				Name:            user.Name,
-				TwitterUsername: null.NewString(user.TwitterUsername.String, user.TwitterUsername.Valid),
-				GithubUsername:  null.NewString(user.TwitterUsername.String, user.GithubUsername.Valid),
-				UserText:        null.NewString(user.UserText.String, user.UserText.Valid),
-				UserIcon:        null.NewString(user.UserIcon.String, user.UserIcon.Valid),
-				CreatedAt:       user.CreatedAt,
-			},
+			UserID:          user.UserID,
+			UserName:        null.NewString(user.UserName.String, user.UserName.Valid),
+			Name:            user.Name,
+			TwitterUsername: null.NewString(user.TwitterUsername.String, user.TwitterUsername.Valid),
+			GithubUsername:  null.NewString(user.TwitterUsername.String, user.GithubUsername.Valid),
+			UserText:        null.NewString(user.UserText.String, user.UserText.Valid),
+			UserIcon:        null.NewString(user.UserIcon.String, user.UserIcon.Valid),
+			CreatedAt:       user.CreatedAt,
 		},
 	)
 }
@@ -74,16 +72,14 @@ func (h *userHandler) GetByName(c *gin.Context) {
 	}
 	util.SuccessDataResponser(c,
 		json.GetUserResJSON{
-			User: json.UserJSON{
-				UserID:          user.UserID,
-				UserName:        null.NewString(user.UserName.String, user.UserName.Valid),
-				Name:            user.Name,
-				TwitterUsername: null.NewString(user.TwitterUsername.String, user.TwitterUsername.Valid),
-				GithubUsername:  null.NewString(user.TwitterUsername.String, user.GithubUsername.Valid),
-				UserText:        null.NewString(user.UserText.String, user.UserText.Valid),
-				UserIcon:        null.NewString(user.UserIcon.String, user.UserIcon.Valid),
-				CreatedAt:       user.CreatedAt,
-			},
+			UserID:          user.UserID,
+			UserName:        null.NewString(user.UserName.String, user.UserName.Valid),
+			Name:            user.Name,
+			TwitterUsername: null.NewString(user.TwitterUsername.String, user.TwitterUsername.Valid),
+			GithubUsername:  null.NewString(user.TwitterUsername.String, user.GithubUsername.Valid),
+			UserText:        null.NewString(user.UserText.String, user.UserText.Valid),
+			UserIcon:        null.NewString(user.UserIcon.String, user.UserIcon.Valid),
+			CreatedAt:       user.CreatedAt,
 		},
 	)
 }

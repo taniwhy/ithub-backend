@@ -7,7 +7,7 @@ GOGET=$(GOCMD) get
 BINARY_NAME=main
 BINARY_UNIX=$(BINARY_NAME)_unix
 
-run: 
+run:
 	realize start
 test:
 	$(GOTEST) -v ./...

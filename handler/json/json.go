@@ -6,8 +6,8 @@ import (
 	"gopkg.in/guregu/null.v3"
 )
 
-// UserJSON :
-type UserJSON struct {
+// GetUserResJSON :
+type GetUserResJSON struct {
 	UserID          string      `json:"user_id" binding:"required"`
 	UserName        null.String `json:"user_name" binding:"required"`
 	Name            string      `json:"name" binding:"required"`
@@ -16,11 +16,6 @@ type UserJSON struct {
 	UserText        null.String `json:"user_text" binding:"required"`
 	UserIcon        null.String `json:"user_icon" binding:"required"`
 	CreatedAt       time.Time   `json:"created_at" binding:"required"`
-}
-
-// GetUserResJSON :
-type GetUserResJSON struct {
-	User UserJSON `json:"user" binding:"required"`
 }
 
 // UpdateUserReqJSON : ユーザー更新リクエストボディ
@@ -33,8 +28,8 @@ type UpdateUserReqJSON struct {
 	UserIcon        null.String `json:"user_icon" binding:"required"`
 }
 
-// NoteJSON :
-type NoteJSON struct {
+// GetNoteResJSON :
+type GetNoteResJSON struct {
 	NoteID    string      `json:"user_id" binding:"required"`
 	UserName  null.String `json:"user_name" binding:"required"`
 	NoteTitle string      `json:"note_title" binding:"required"`
@@ -42,7 +37,12 @@ type NoteJSON struct {
 	CreatedAt time.Time   `json:"created_at" binding:"required"`
 }
 
-// GetNoteResJSON :
-type GetNoteResJSON struct {
-	Note NoteJSON `json:"note" binding:"required"`
+// GetFollowsResJSON :
+type GetFollowsResJSON struct {
+	UserName  null.String `json:"user_name" binding:"required"`
+	Name      string      `json:"name" binding:"required"`
+	UserText  null.String `json:"user_text" binding:"required"`
+	UserIcon  null.String `json:"user_icon" binding:"required"`
+	Following bool        `json:"following" binding:"required"`
+	CreatedAt time.Time   `json:"created_at" binding:"required"`
 }
