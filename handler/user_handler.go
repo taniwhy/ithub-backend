@@ -48,8 +48,8 @@ func (h *userHandler) GetMe(c *gin.Context) {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.SuccessDataResponser(
-		c, json.GetUserResJSON{
+	util.SuccessDataResponser(c,
+		json.GetUserResJSON{
 			User: json.UserJSON{
 				UserID:          user.UserID,
 				UserName:        null.NewString(user.UserName.String, user.UserName.Valid),
@@ -60,7 +60,8 @@ func (h *userHandler) GetMe(c *gin.Context) {
 				UserIcon:        null.NewString(user.UserIcon.String, user.UserIcon.Valid),
 				CreatedAt:       user.CreatedAt,
 			},
-		})
+		},
+	)
 }
 
 // GetByName : GetByName関数はユーザー情報を取得しレスポンスを返却します
@@ -71,8 +72,8 @@ func (h *userHandler) GetByName(c *gin.Context) {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.SuccessDataResponser(
-		c, json.GetUserResJSON{
+	util.SuccessDataResponser(c,
+		json.GetUserResJSON{
 			User: json.UserJSON{
 				UserID:          user.UserID,
 				UserName:        null.NewString(user.UserName.String, user.UserName.Valid),
@@ -83,7 +84,8 @@ func (h *userHandler) GetByName(c *gin.Context) {
 				UserIcon:        null.NewString(user.UserIcon.String, user.UserIcon.Valid),
 				CreatedAt:       user.CreatedAt,
 			},
-		})
+		},
+	)
 }
 
 // Update : Update関数はユーザー情報を更新しレスポンスを返却します
