@@ -36,7 +36,6 @@ func Init(dbConn *gorm.DB) *gin.Engine {
 		})
 		auth.POST("/google/login", authHandler.Login)
 		auth.DELETE("/logout", authHandler.Logout)
-		auth.POST("/reflesh")
 
 		v1.GET("/me", userHandler.GetMe)
 		users.GET("/:name", userHandler.GetByName)
