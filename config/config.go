@@ -6,8 +6,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// SignBytes : 秘密鍵
-var SignBytes string
+// SecretKey : 秘密鍵
+var SecretKey string
 
 func init() {
 	switch os.Getenv("GO_ENV") {
@@ -18,7 +18,7 @@ func init() {
 		}
 	default:
 	}
-	SignBytes = os.Getenv("AUTHORIZE_RSA")
+	SecretKey = os.Getenv("AUTHORIZE_RSA")
 }
 
 // GetDatabaseConf :　データベースの接続情報の取得

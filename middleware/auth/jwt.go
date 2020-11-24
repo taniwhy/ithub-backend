@@ -18,7 +18,7 @@ func GenerateAccessToken(userID string, isAdmin bool) string {
 		"exp":      time.Now().Add(time.Hour * 1000).Unix(),
 		"is_admin": isAdmin,
 	})
-	accessToken, err := token.SignedString([]byte(config.SignBytes))
+	accessToken, err := token.SignedString([]byte(config.SecretKey))
 	if err != nil {
 		panic(err)
 	}
@@ -31,7 +31,7 @@ func GetTokenClaimsFromToken(tokenString string) (jwt.MapClaims, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return "", fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(config.SignBytes), nil
+		return []byte(config.SecretKey), nil
 	})
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func GetTokenClaimsFromToken(tokenString string) (jwt.MapClaims, error) {
 // GetTokenClaimsFromRequest : コンテキストからトークンClaimを取得
 func GetTokenClaimsFromRequest(c *gin.Context) (jwt.MapClaims, error) {
 	token, err := request.ParseFromRequest(c.Request, request.AuthorizationHeaderExtractor, func(token *jwt.Token) (interface{}, error) {
-		return config.SignBytes, nil
+		return config.SecretKey, nil
 	})
 	if err != nil {
 		return nil, err

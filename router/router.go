@@ -22,7 +22,7 @@ func Init(dbConn *gorm.DB) *gin.Engine {
 	dbConn.LogMode(true)
 
 	r := gin.Default()
-	store := cookie.NewStore([]byte(config.SignBytes))
+	store := cookie.NewStore([]byte(config.SecretKey))
 	r.Use(sessions.Sessions("_session", store))
 	r.Use(cors.Write())
 

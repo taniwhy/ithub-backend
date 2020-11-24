@@ -13,7 +13,7 @@ import (
 func TokenAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		_, err := request.ParseFromRequest(c.Request, request.AuthorizationHeaderExtractor, func(token *jwt.Token) (interface{}, error) {
-			b := []byte(config.SignBytes)
+			b := []byte(config.SecretKey)
 			return b, nil
 		})
 		if err != nil {
@@ -27,7 +27,7 @@ func TokenAuth() gin.HandlerFunc {
 func AdminAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := request.ParseFromRequest(c.Request, request.AuthorizationHeaderExtractor, func(token *jwt.Token) (interface{}, error) {
-			return []byte(config.SignBytes), nil
+			return []byte(config.SecretKey), nil
 		})
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -35,7 +35,7 @@ func AdminAuth() gin.HandlerFunc {
 		}
 		claims := token.Claims.(jwt.MapClaims)
 		if claims["is_admin"].(bool) == false {
-			c.JSON(http.StatusForbidden, gin.H{"message": "not admin user"})
+			c.JSON(http.StatusForbidden, gin.H{"message": http.StatusText(http.StatusForbidden)})
 			c.Abort()
 		}
 	}
