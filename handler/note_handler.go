@@ -17,7 +17,7 @@ import (
 
 // INoteHandler :
 type INoteHandler interface {
-	Get(c *gin.Context)
+	GetList(c *gin.Context)
 	GetByID(c *gin.Context)
 	Create(c *gin.Context)
 	Update(c *gin.Context)
@@ -33,6 +33,7 @@ func NewNoteHandler(nR repository.INoteRepository) INoteHandler {
 	return &noteHandler{noteRepository: nR}
 }
 
+<<<<<<< HEAD
 func (h *noteHandler) Get(c *gin.Context) {
 	//panic("not implemented") // TODO: Implement
 	session := sessions.Default(c)
@@ -58,6 +59,10 @@ func (h *noteHandler) Get(c *gin.Context) {
 				CreatedAt: note.CreatedAt,
 			},
 		})
+=======
+func (h *noteHandler) GetList(c *gin.Context) {
+	panic("not implemented") // TODO: Implement
+>>>>>>> dev
 }
 
 func (h *noteHandler) GetByID(c *gin.Context) {

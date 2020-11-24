@@ -32,3 +32,17 @@ type UpdateUserReqJSON struct {
 	UserText        null.String `json:"user_text" binding:"required"`
 	UserIcon        null.String `json:"user_icon" binding:"required"`
 }
+
+// NoteJSON :
+type NoteJSON struct {
+	NoteID    string      `json:"user_id" binding:"required"`
+	UserName  null.String `json:"user_name" binding:"required"`
+	NoteTitle string      `json:"note_title" binding:"required"`
+	NoteText  string      `json:"note_text" binding:"required"`
+	CreatedAt time.Time   `json:"created_at" binding:"required"`
+}
+
+// GetNoteResJSON :
+type GetNoteResJSON struct {
+	Note NoteJSON `json:"note" binding:"required"`
+}
