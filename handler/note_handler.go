@@ -7,7 +7,7 @@ import (
 
 // INoteHandler :
 type INoteHandler interface {
-	Get(c *gin.Context)
+	GetList(c *gin.Context)
 	GetByID(c *gin.Context)
 	Create(c *gin.Context)
 	Update(c *gin.Context)
@@ -23,7 +23,7 @@ func NewNoteHandler(nR repository.INoteRepository) INoteHandler {
 	return &noteHandler{noteRepository: nR}
 }
 
-func (h *noteHandler) Get(c *gin.Context) {
+func (h *noteHandler) GetList(c *gin.Context) {
 	panic("not implemented") // TODO: Implement
 }
 
