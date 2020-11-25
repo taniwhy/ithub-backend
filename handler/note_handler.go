@@ -45,7 +45,7 @@ func (h *noteHandler) GetList(c *gin.Context) {
 	res := []json.GetNoteResJSON{}
 	for _, n := range note {
 		r := json.GetNoteResJSON{
-			NoteID:    uuid.UuID(),
+			NoteID:    n.NoteID,
 			UserName:  null.NewString(n.UserName.String, n.UserName.Valid),
 			NoteTitle: n.NoteTitle,
 			NoteText:  n.NoteText,
@@ -54,31 +54,6 @@ func (h *noteHandler) GetList(c *gin.Context) {
 		res = append(res, r)
 	}
 	util.SuccessDataResponser(c, res)
-	/*
-		session := sessions.Default(c)
-		token := session.Get("_token")
-		claims, err := auth.GetTokenClaimsFromToken(token.(string))
-		if err != nil {
-			util.ErrorResponser(c, http.StatusBadRequest, err.Error())
-			return
-		}
-		noteID := claims["sub"].(string)
-		note, err := h.noteRepository.FindByID(noteID)
-		if err != nil {
-			util.ErrorResponser(c, http.StatusBadRequest, err.Error())
-			return
-		}
-		util.SuccessDataResponser(
-			c, json.GetNoteResJSON{
-				Note: json.NoteJSON{
-					NoteID: uuid.UuID(),
-					UserID: note.userID,
-					//NoteTitle: note.noteTitle,
-					//NoteText:  note.noteText,
-					CreatedAt: note.CreatedAt,
-				},
-			})
-	*/
 }
 
 func (h *noteHandler) GetByID(c *gin.Context) {
@@ -89,19 +64,6 @@ func (h *noteHandler) GetByID(c *gin.Context) {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	/*
-		util.SuccessDataResponser(c,
-			json.GetNoteResJSON{
-				Note: json.NoteJSON{
-					NoteID:    uuid.UuID(),
-					UserID:    note.userID,
-					NoteTitle: note.noteTitle,
-					NoteText:  note.noteText,
-					CreatedAt: note.CreatedAt,
-				},
-			},
-		)
-	*/
 	util.SuccessDataResponser(c, note)
 }
 
@@ -112,7 +74,15 @@ func (h *noteHandler) Create(c *gin.Context) {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	newNote := model.NewNote(body.NoteTitle)
+	session := sessions.Default(c)
+	token := session.Get("_token")
+	claims, err := auth.GetTokenClaimsFromToken(token.(string))
+	if err != nil {
+		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	noteID := claims["sub"].(string)
+	newNote := model.NewNote(noteID, body.NoteTitle, body.NoteText)
 	fmt.Println(newNote)
 	err := h.NoteRepository.Insert(newNote)
 	if err != nil {
