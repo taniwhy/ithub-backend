@@ -10,22 +10,22 @@ import (
 
 // Follow :
 type Follow struct {
-	FollowID     string
-	UserID       string
-	FollowUserID string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    sql.NullTime
+	FollowID       string
+	UserName       string
+	FollowUserName string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      sql.NullTime
 }
 
 // NewFollow : Tagテーブルのレコードモデル生成
-func NewFollow(userID, followUserID string) *Follow {
+func NewFollow(userName, followUserName string) *Follow {
 	return &Follow{
-		FollowID:     uuid.UuID(),
-		UserID:       userID,
-		FollowUserID: followUserID,
-		CreatedAt:    clock.Now(),
-		UpdatedAt:    clock.Now(),
-		DeletedAt:    sql.NullTime{Valid: false},
+		FollowID:       uuid.UuID(),
+		UserName:       userName,
+		FollowUserName: followUserName,
+		CreatedAt:      clock.Now(),
+		UpdatedAt:      clock.Now(),
+		DeletedAt:      sql.NullTime{Valid: false},
 	}
 }

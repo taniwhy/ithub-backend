@@ -99,7 +99,7 @@ func (h *authHandler) Login(c *gin.Context) {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	accessToken := auth.GenerateAccessToken(u.UserID, u.IsAdmin)
+	accessToken := auth.GenerateAccessToken(u.UserID, u.UserName.String, u.IsAdmin)
 	session := sessions.Default(c)
 	session.Set("_token", accessToken)
 	session.Save()
