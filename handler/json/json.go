@@ -46,3 +46,17 @@ type GetFollowsResJSON struct {
 	Following bool        `json:"following" binding:"required"`
 	CreatedAt time.Time   `json:"created_at" binding:"required"`
 }
+
+// GetTagsResJSON : タグ取得リクエストボディ
+type GetTagsResJSON struct {
+	TagID     string      `json:"tag_id" binding:"required"`
+	TagName   string      `json:"tag_name" binding:"required"`
+	TagIcon   null.String `json:"tag_icon" binding:"required"`
+	CreatedAt time.Time   `json:"created_at" binding:"required"`
+}
+
+// CreateTagReqJSON : 新規タグ作成リクエストボディ
+type CreateTagReqJSON struct {
+	TagName string `json:"tag_name" binding:"required"`
+	TagIcon string `json:"tag_icon"`
+}
