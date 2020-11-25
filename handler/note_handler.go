@@ -43,13 +43,13 @@ func (h *noteHandler) GetList(c *gin.Context) {
 		return
 	}
 	res := []json.GetNoteResJSON{}
-	for _, t := range note {
+	for _, n := range note {
 		r := json.GetNoteResJSON{
 			NoteID:    uuid.UuID(),
-			UserName:  null.NewString(user.UserName.String, user.UserName.Valid),
-			NoteTitle: note.noteTitle,
-			NoteText:  note.noteText,
-			CreatedAt: note.CreatedAt,
+			UserName:  null.NewString(n.UserName.String, n.UserName.Valid),
+			NoteTitle: n.NoteTitle,
+			NoteText:  n.NoteText,
+			CreatedAt: n.CreatedAt,
 		}
 		res = append(res, r)
 	}
