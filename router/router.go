@@ -15,9 +15,11 @@ import (
 // Init : Init関数は依存性の注入とURLパスルーティングを行います
 func Init(dbConn *gorm.DB) *gin.Engine {
 	userDatastore := datastore.NewUserDatastore(dbConn)
+	tagDatastore := datastore.NewTagDatastore(dbConn)
 	userService := service.NewUserService(userDatastore)
 	authHandler := handler.NewAuthHandler(userDatastore, userService)
 	userHandler := handler.NewUserHandler(userDatastore)
+	tagHandler := handler.NewTagHandler(tagDatastore)
 
 	dbConn.LogMode(true)
 
@@ -29,6 +31,7 @@ func Init(dbConn *gorm.DB) *gin.Engine {
 	v1 := r.Group("/v1")
 	auth := v1.Group("/auth")
 	users := v1.Group("/users")
+	tags := v1.Group("/tags")
 	{
 		v1.GET("/", func(c *gin.Context) {
 			session := sessions.Default(c)
@@ -36,13 +39,14 @@ func Init(dbConn *gorm.DB) *gin.Engine {
 		})
 		auth.POST("/google/login", authHandler.Login)
 		auth.DELETE("/logout", authHandler.Logout)
-		auth.POST("/reflesh")
 
 		v1.GET("/me", userHandler.GetMe)
 		users.GET("/:name", userHandler.GetByName)
 		users.PUT("/", userHandler.Update)
 		users.DELETE("/", userHandler.Delete)
 
+		tags.GET("/", tagHandler.GetList)
+		tags.POST("/", tagHandler.Create)
 	}
 	return r
 }

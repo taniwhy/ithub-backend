@@ -32,7 +32,7 @@ func NewUser(gID, name, icon, email string) *User {
 		TwitterUsername: sql.NullString{String: "", Valid: false},
 		GithubUsername:  sql.NullString{String: "", Valid: false},
 		UserText:        sql.NullString{String: "", Valid: false},
-		UserIcon:        sql.NullString{String: "", Valid: false},
+		UserIcon:        sql.NullString{String: icon, Valid: true},
 		Email:           email,
 		IsAdmin:         false,
 		CreatedAt:       clock.Now(),
