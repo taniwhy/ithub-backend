@@ -17,7 +17,7 @@ import (
 
 // INoteHandler :
 type INoteHandler interface {
-	GetList(c *gin.Context)
+	Get(c *gin.Context)
 	GetByID(c *gin.Context)
 	Create(c *gin.Context)
 	Update(c *gin.Context)
@@ -33,7 +33,7 @@ func NewNoteHandler(nR repository.INoteRepository) INoteHandler {
 	return &noteHandler{noteRepository: nR}
 }
 
-<<<<<<< HEAD
+// Get : Get関数は自ユーザー情報を取得しレスポンスを返却します
 func (h *noteHandler) Get(c *gin.Context) {
 	//panic("not implemented") // TODO: Implement
 	session := sessions.Default(c)
@@ -52,25 +52,56 @@ func (h *noteHandler) Get(c *gin.Context) {
 	util.SuccessDataResponser(
 		c, json.GetNoteResJSON{
 			Note: json.NoteJSON{
-				NoteID:    uuid.UuID(),
-				UserID:    note.userID,
-				NoteTitle: body.noteTitle,
-				NoteText:  body.noteText,
+				NoteID: uuid.UuID(),
+				UserID: note.userID,
+				//NoteTitle: note.noteTitle,
+				//NoteText:  note.noteText,
 				CreatedAt: note.CreatedAt,
 			},
 		})
-=======
-func (h *noteHandler) GetList(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
->>>>>>> dev
 }
 
 func (h *noteHandler) GetByID(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+	//panic("not implemented") // TODO: Implement
+	id := c.Params.ByID("id")
+	note, err := h.noteRepository.FindByID(id)
+	if err != nil {
+		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.SuccessDataResponser(c, note)
+	/*
+		util.SuccessDataResponser(c,
+			json.GetNoteResJSON{
+				Note: json.NoteJSON{
+					NoteID:    uuid.UuID(),
+					UserID:    note.userID,
+					NoteTitle: note.noteTitle,
+					NoteText:  note.noteText,
+					CreatedAt: note.CreatedAt,
+				},
+			},
+		)
+	*/
 }
 
 func (h *noteHandler) Create(c *gin.Context) {
-	panic("not implemented") // TODO: Implement
+	//panic("not implemented") // TODO: Implement
+	target := c.Query("target")
+	session := sessions.Default(c)
+	token := session.Get("_token")
+	claims, err := auth.GetTokenClaimsFromToken(token.(string))
+	if err != nil {
+		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	userName := claims["user_name"].(string)
+	newNote := model.NewNote(userName, target)
+	if err := h.noteRepository.Insert(newNote); err != nil {
+		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.SuccessMessageResponser(c, "ok")
 }
 
 // Update : Update関数はユーザー情報を更新しレスポンスを返却します
