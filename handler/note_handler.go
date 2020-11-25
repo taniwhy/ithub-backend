@@ -33,7 +33,6 @@ func NewNoteHandler(nR repository.INoteRepository) INoteHandler {
 	return &noteHandler{noteRepository: nR}
 }
 
-// Get : Get関数は自ユーザー情報を取得しレスポンスを返却します
 func (h *noteHandler) Get(c *gin.Context) {
 	//panic("not implemented") // TODO: Implement
 	session := sessions.Default(c)
