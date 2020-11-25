@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -13,11 +14,12 @@ import (
 	"github.com/taniwhy/ithub-backend/middleware/auth"
 	"github.com/taniwhy/ithub-backend/util/clock"
 	"github.com/taniwhy/ithub-backend/util/uuid"
+	"gopkg.in/guregu/null.v3"
 )
 
 // INoteHandler :
 type INoteHandler interface {
-	Get(c *gin.Context)
+	GetList(c *gin.Context)
 	GetByID(c *gin.Context)
 	Create(c *gin.Context)
 	Update(c *gin.Context)
@@ -33,31 +35,50 @@ func NewNoteHandler(nR repository.INoteRepository) INoteHandler {
 	return &noteHandler{noteRepository: nR}
 }
 
-func (h *noteHandler) Get(c *gin.Context) {
+func (h *noteHandler) GetList(c *gin.Context) {
 	//panic("not implemented") // TODO: Implement
-	session := sessions.Default(c)
-	token := session.Get("_token")
-	claims, err := auth.GetTokenClaimsFromToken(token.(string))
+	note, err := h.noteRepository.FindList()
 	if err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	noteID := claims["sub"].(string)
-	note, err := h.noteRepository.FindByID(noteID)
-	if err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
-		return
+	res := []json.GetNoteResJSON{}
+	for _, t := range note {
+		r := json.GetNoteResJSON{
+			NoteID:    uuid.UuID(),
+			UserName:  null.NewString(user.UserName.String, user.UserName.Valid),
+			NoteTitle: note.noteTitle,
+			NoteText:  note.noteText,
+			CreatedAt: note.CreatedAt,
+		}
+		res = append(res, r)
 	}
-	util.SuccessDataResponser(
-		c, json.GetNoteResJSON{
-			Note: json.NoteJSON{
-				NoteID: uuid.UuID(),
-				UserID: note.userID,
-				//NoteTitle: note.noteTitle,
-				//NoteText:  note.noteText,
-				CreatedAt: note.CreatedAt,
-			},
-		})
+	util.SuccessDataResponser(c, res)
+	/*
+		session := sessions.Default(c)
+		token := session.Get("_token")
+		claims, err := auth.GetTokenClaimsFromToken(token.(string))
+		if err != nil {
+			util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+			return
+		}
+		noteID := claims["sub"].(string)
+		note, err := h.noteRepository.FindByID(noteID)
+		if err != nil {
+			util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+			return
+		}
+		util.SuccessDataResponser(
+			c, json.GetNoteResJSON{
+				Note: json.NoteJSON{
+					NoteID: uuid.UuID(),
+					UserID: note.userID,
+					//NoteTitle: note.noteTitle,
+					//NoteText:  note.noteText,
+					CreatedAt: note.CreatedAt,
+				},
+			})
+	*/
 }
 
 func (h *noteHandler) GetByID(c *gin.Context) {
@@ -68,7 +89,6 @@ func (h *noteHandler) GetByID(c *gin.Context) {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.SuccessDataResponser(c, note)
 	/*
 		util.SuccessDataResponser(c,
 			json.GetNoteResJSON{
@@ -82,21 +102,20 @@ func (h *noteHandler) GetByID(c *gin.Context) {
 			},
 		)
 	*/
+	util.SuccessDataResponser(c, note)
 }
 
 func (h *noteHandler) Create(c *gin.Context) {
 	//panic("not implemented") // TODO: Implement
-	target := c.Query("target")
-	session := sessions.Default(c)
-	token := session.Get("_token")
-	claims, err := auth.GetTokenClaimsFromToken(token.(string))
-	if err != nil {
+	body := json.CreateNoteReqJSON{}
+	if err := c.BindJSON(&body); err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	userName := claims["user_name"].(string)
-	newNote := model.NewNote(userName, target)
-	if err := h.noteRepository.Insert(newNote); err != nil {
+	newNote := model.NewNote(body.NoteTitle)
+	fmt.Println(newNote)
+	err := h.NoteRepository.Insert(newNote)
+	if err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -126,7 +145,6 @@ func (h *noteHandler) Update(c *gin.Context) {
 		NoteText:  body.noteText,
 		CreatedAt: clock.Now(),
 		UpdatedAt: clock.Now(),
-		//DeletedAt: sql.NullTime{Valid: body.DeletedAt},
 	}); err != nil {
 		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
 		return
