@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/taniwhy/ithub-backend/db/dao"
@@ -11,13 +12,12 @@ import (
 
 func main() {
 	dbConn := dao.NewDatabase()
-
 	defer dbConn.Close()
 
 	routers := router.Init(dbConn)
 
 	server := &http.Server{
-		Addr:           ":8000",
+		Addr:           ":" + os.Getenv("PORT"),
 		Handler:        routers,
 		ReadTimeout:    5 * time.Second,
 		WriteTimeout:   10 * time.Second,

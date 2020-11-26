@@ -31,9 +31,21 @@ func (d *userDatastore) FindByID(id string) (*model.User, error) {
 	return u, nil
 }
 
-func (d *userDatastore) FindByUserName(UserName string) (*model.User, error) {
+func (d *userDatastore) FindDeletedByID(id string) (*model.User, error) {
 	u := &model.User{}
-	err := d.db.Where("user_name = ?", UserName).First(&u).Error
+	err := d.db.Unscoped().Where("user_id = ?", id).First(&u).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errors.ErrDatabase{Detail: err.Error()}
+	}
+	return u, nil
+}
+
+func (d *userDatastore) FindByName(name string) (*model.User, error) {
+	u := &model.User{}
+	err := d.db.Where("user_name = ?", name).First(&u).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return nil, errors.ErrRecordNotFound{}
 	}
@@ -48,14 +60,28 @@ func (d *userDatastore) Insert(user *model.User) error {
 }
 
 func (d *userDatastore) Update(user *model.User) error {
-	return d.db.Updates(user).Error
+	return d.db.Model(&user).Where("user_id = ?", user.UserID).Updates(&user).Error
 }
 
-func (d *userDatastore) Delete(userName string) error {
+func (d *userDatastore) Delete(id string) error {
 	user := model.User{}
 	err := d.db.
-		Model(&user).Where("user_name = ?", userName).
+		Model(&user).Where("user_id = ?", id).
 		Update("deleted_at", sql.NullTime{Time: clock.Now(), Valid: true}).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return errors.ErrRecordNotFound{}
+	}
+	if err != nil {
+		return errors.ErrDatabase{Detail: err.Error()}
+	}
+	return nil
+}
+
+func (d *userDatastore) Restore(id string) error {
+	user := model.User{}
+	err := d.db.
+		Model(&user).Unscoped().Where("user_id = ?", id).
+		Update("deleted_at", sql.NullTime{Valid: false}).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return errors.ErrRecordNotFound{}
 	}
