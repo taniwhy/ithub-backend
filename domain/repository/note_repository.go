@@ -8,5 +8,5 @@ type INoteRepository interface {
 	FindByID(id string) (*model.Note, error)
 	Insert(note *model.Note) error
 	Update(note *model.Note) error
-	Delete(id string) error
+	Delete(userID, noteID string) error
 }

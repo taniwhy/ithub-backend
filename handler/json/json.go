@@ -30,15 +30,21 @@ type UpdateUserReqJSON struct {
 
 // GetNoteResJSON :
 type GetNoteResJSON struct {
-	NoteID    string      `json:"user_id" binding:"required"`
-	UserName  null.String `json:"user_name" binding:"required"`
-	NoteTitle string      `json:"note_title" binding:"required"`
-	NoteText  string      `json:"note_text" binding:"required"`
-	CreatedAt time.Time   `json:"created_at" binding:"required"`
+	NoteID    string    `json:"user_id" binding:"required"`
+	UserName  string    `json:"user_name" binding:"required"`
+	NoteTitle string    `json:"note_title" binding:"required"`
+	NoteText  string    `json:"note_text" binding:"required"`
+	CreatedAt time.Time `json:"created_at" binding:"required"`
 }
 
 // CreateNoteReqJSON : 新規ノート作成リクエストボディ
 type CreateNoteReqJSON struct {
+	NoteTitle string `json:"note_title" binding:"required"`
+	NoteText  string `json:"note_text" binding:"required"`
+}
+
+// UpdateNoteReqJSON : 新規ノート更新リクエストボディ
+type UpdateNoteReqJSON struct {
 	NoteTitle string `json:"note_title" binding:"required"`
 	NoteText  string `json:"note_text" binding:"required"`
 }
