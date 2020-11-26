@@ -37,6 +37,12 @@ type GetNoteResJSON struct {
 	CreatedAt time.Time   `json:"created_at" binding:"required"`
 }
 
+// CreateNoteReqJSON : 新規ノート作成リクエストボディ
+type CreateNoteReqJSON struct {
+	NoteTitle string `json:"note_title" binding:"required"`
+	NoteText  string `json:"note_text" binding:"required"`
+}
+
 // GetFollowsResJSON :
 type GetFollowsResJSON struct {
 	UserName  null.String `json:"user_name" binding:"required"`
