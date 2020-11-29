@@ -21,7 +21,7 @@ type Favorite struct {
 // NewFavorite : Favoriteテーブルのレコードモデル生成
 func NewFavorite(userID, noteID string) *Favorite {
 	return &Favorite{
-		FavoriteID: uuid.UuID(),
+		FavoriteID: uuid.New(),
 		UserID:     userID,
 		NoteID:     noteID,
 		CreatedAt:  clock.Now(),

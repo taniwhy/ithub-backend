@@ -22,7 +22,7 @@ type Comment struct {
 // NewComment : Commentテーブルのレコードモデル生成
 func NewComment(userID, noteID, comment string) *Comment {
 	return &Comment{
-		CommentID: uuid.UuID(),
+		CommentID: uuid.New(),
 		UserID:    userID,
 		NoteID:    noteID,
 		Comment:   comment,

@@ -21,7 +21,7 @@ type Tag struct {
 // NewTag : Tagテーブルのレコードモデル生成
 func NewTag(tagName, TagIcon string) *Tag {
 	return &Tag{
-		TagID:     uuid.UuID(),
+		TagID:     uuid.New(),
 		TagName:   tagName,
 		TagIcon:   sql.NullString{String: TagIcon, Valid: TagIcon != ""},
 		CreatedAt: clock.Now(),

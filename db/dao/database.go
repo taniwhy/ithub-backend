@@ -19,9 +19,11 @@ func NewDatabase() *gorm.DB {
 	if err != nil {
 		panic(err.Error())
 	}
+
 	conn, err = gorm.Open("postgres", dsn)
 	if err != nil {
 		panic(err.Error())
 	}
+
 	return conn
 }

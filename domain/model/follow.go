@@ -21,7 +21,7 @@ type Follow struct {
 // NewFollow : Tagテーブルのレコードモデル生成
 func NewFollow(userName, followUserName string) *Follow {
 	return &Follow{
-		FollowID:       uuid.UuID(),
+		FollowID:       uuid.New(),
 		UserName:       userName,
 		FollowUserName: followUserName,
 		CreatedAt:      clock.Now(),

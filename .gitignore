@@ -14,9 +14,4 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-memo
-id_rsa.dev.pub
-id_rsa.dev
-ithub.code-workspace
-
 server
