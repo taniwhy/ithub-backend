@@ -10,5 +10,6 @@ var UuID = func() string {
 	if err != nil {
 		panic(err.Error())
 	}
+
 	return uuid.String()
 }

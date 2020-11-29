@@ -18,6 +18,7 @@ func init() {
 		}
 	default:
 	}
+
 	SecretKey = os.Getenv("AUTHORIZE_RSA")
 }
 

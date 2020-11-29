@@ -18,6 +18,7 @@ func NewTagDatastore(db *gorm.DB) repository.ITagRepository {
 
 func (d *tagDatastore) FindList() ([]*model.Tag, error) {
 	t := []*model.Tag{}
+
 	err := d.db.Find(&t).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return nil, err
@@ -25,6 +26,7 @@ func (d *tagDatastore) FindList() ([]*model.Tag, error) {
 	if err != nil {
 		return nil, errors.ErrDatabase{Detail: err.Error()}
 	}
+
 	return t, nil
 }
 

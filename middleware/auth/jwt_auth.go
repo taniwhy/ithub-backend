@@ -33,7 +33,9 @@ func AdminAuth() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			c.Abort()
 		}
+
 		claims := token.Claims.(jwt.MapClaims)
+
 		if claims["is_admin"].(bool) == false {
 			c.JSON(http.StatusForbidden, gin.H{"message": http.StatusText(http.StatusForbidden)})
 			c.Abort()

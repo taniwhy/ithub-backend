@@ -19,10 +19,12 @@ func GenerateAccessToken(userID, userName string, isAdmin bool) string {
 		"exp":       time.Now().Add(time.Hour * 1000).Unix(),
 		"is_admin":  isAdmin,
 	})
+
 	accessToken, err := token.SignedString([]byte(config.SecretKey))
 	if err != nil {
 		panic(err)
 	}
+
 	return accessToken
 }
 
@@ -37,7 +39,9 @@ func GetTokenClaimsFromToken(tokenString string) (jwt.MapClaims, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	claims := token.Claims.(jwt.MapClaims)
+
 	return claims, nil
 }
 
@@ -49,6 +53,8 @@ func GetTokenClaimsFromRequest(c *gin.Context) (jwt.MapClaims, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	claims := token.Claims.(jwt.MapClaims)
+
 	return claims, nil
 }

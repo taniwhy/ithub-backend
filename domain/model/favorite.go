@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/taniwhy/ithub-backend/util/clock"
-	"github.com/taniwhy/ithub-backend/util/uuid"
+	"github.com/taniwhy/ithub-backend/package/util/clock"
+	"github.com/taniwhy/ithub-backend/package/util/uuid"
 )
 
 // Favorite :

@@ -8,9 +8,10 @@ import (
 	"github.com/taniwhy/ithub-backend/domain/model"
 	"github.com/taniwhy/ithub-backend/domain/repository"
 	"github.com/taniwhy/ithub-backend/handler/json"
-	"github.com/taniwhy/ithub-backend/handler/util"
 	"github.com/taniwhy/ithub-backend/middleware/auth"
-	"github.com/taniwhy/ithub-backend/util/clock"
+	"github.com/taniwhy/ithub-backend/package/error"
+	"github.com/taniwhy/ithub-backend/package/response"
+	"github.com/taniwhy/ithub-backend/package/util/clock"
 )
 
 // INoteHandler : インターフェース
@@ -34,97 +35,121 @@ func NewNoteHandler(nR repository.INoteRepository) INoteHandler {
 func (h *noteHandler) GetList(c *gin.Context) {
 	note, err := h.noteRepository.FindList()
 	if err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
-	res := []json.GetNoteResJSON{}
+
+	notes := []json.GetNoteResJSON{}
+
 	for _, n := range note {
-		r := json.GetNoteResJSON{
+		n := json.GetNoteResJSON{
 			NoteID:    n.NoteID,
 			UserName:  n.UserID,
 			NoteTitle: n.NoteTitle,
 			NoteText:  n.NoteText,
 			CreatedAt: n.CreatedAt,
 		}
-		res = append(res, r)
+		notes = append(notes, n)
 	}
-	util.SuccessDataResponser(c, res)
+
+	response.Success(c, notes)
 }
 
 func (h *noteHandler) GetByID(c *gin.Context) {
 	id := c.Params.ByName("id")
+
 	note, err := h.noteRepository.FindByID(id)
 	if err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
-	util.SuccessDataResponser(c, note)
+
+	response.Success(c, note)
 }
 
 func (h *noteHandler) Create(c *gin.Context) {
 	body := json.CreateNoteReqJSON{}
+
 	if err := c.BindJSON(&body); err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
+
 	session := sessions.Default(c)
-	token := session.Get("_token")
-	claims, err := auth.GetTokenClaimsFromToken(token.(string))
+	token := session.Get("_token").(string)
+
+	claims, err := auth.GetTokenClaimsFromToken(token)
 	if err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
+
 	userID := claims["sub"].(string)
 	newNote := model.NewNote(userID, body.NoteTitle, body.NoteText)
+
 	err = h.noteRepository.Insert(newNote)
 	if err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
-	util.SuccessMessageResponser(c, "ok")
+
+	response.Success(c, nil)
 }
 
 func (h *noteHandler) Update(c *gin.Context) {
-	noteID := c.Params.ByName("id")
 	body := json.UpdateNoteReqJSON{}
+
 	if err := c.ShouldBindJSON(&body); err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
+
 	session := sessions.Default(c)
-	token := session.Get("_token")
-	claims, err := auth.GetTokenClaimsFromToken(token.(string))
+	token := session.Get("_token").(string)
+
+	claims, err := auth.GetTokenClaimsFromToken(token)
 	if err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
+
+	noteID := c.Params.ByName("id")
 	userID := claims["sub"].(string)
-	if err := h.noteRepository.Update(&model.Note{
-		NoteID:    noteID,
-		UserID:    userID,
-		NoteTitle: body.NoteTitle,
-		NoteText:  body.NoteText,
-		UpdatedAt: clock.Now(),
-	}); err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+
+	err = h.noteRepository.Update(
+		&model.Note{
+			NoteID:    noteID,
+			UserID:    userID,
+			NoteTitle: body.NoteTitle,
+			NoteText:  body.NoteText,
+			UpdatedAt: clock.Now(),
+		},
+	)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
-	util.SuccessMessageResponser(c, "ok")
+
+	response.Success(c, nil)
 }
 
 func (h *noteHandler) Delete(c *gin.Context) {
-	noteID := c.Params.ByName("id")
 	session := sessions.Default(c)
-	token := session.Get("_token")
-	claims, err := auth.GetTokenClaimsFromToken(token.(string))
+	token := session.Get("_token").(string)
+
+	claims, err := auth.GetTokenClaimsFromToken(token)
 	if err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
+
 	userID := claims["sub"].(string)
+	noteID := c.Params.ByName("id")
+
 	if err := h.noteRepository.Delete(userID, noteID); err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
-	util.SuccessMessageResponser(c, "ok")
+
+	response.Success(c, nil)
 }

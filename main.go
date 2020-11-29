@@ -23,8 +23,9 @@ func main() {
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
+
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatal("Serve failed")
+		log.Fatal(err)
 		panic(err)
 	}
 }

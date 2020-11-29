@@ -7,7 +7,7 @@ import (
 	"github.com/taniwhy/ithub-backend/datastore/errors"
 	"github.com/taniwhy/ithub-backend/domain/model"
 	"github.com/taniwhy/ithub-backend/domain/repository"
-	"github.com/taniwhy/ithub-backend/util/clock"
+	"github.com/taniwhy/ithub-backend/package/util/clock"
 )
 
 type userDatastore struct {
@@ -21,6 +21,7 @@ func NewUserDatastore(db *gorm.DB) repository.IUserRepository {
 
 func (d *userDatastore) FindByID(id string) (*model.User, error) {
 	u := &model.User{}
+
 	err := d.db.Where("user_id = ?", id).First(&u).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return nil, err
@@ -28,11 +29,13 @@ func (d *userDatastore) FindByID(id string) (*model.User, error) {
 	if err != nil {
 		return nil, errors.ErrDatabase{Detail: err.Error()}
 	}
+
 	return u, nil
 }
 
 func (d *userDatastore) FindDeletedByID(id string) (*model.User, error) {
 	u := &model.User{}
+
 	err := d.db.Unscoped().Where("user_id = ?", id).First(&u).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return nil, nil
@@ -40,11 +43,13 @@ func (d *userDatastore) FindDeletedByID(id string) (*model.User, error) {
 	if err != nil {
 		return nil, errors.ErrDatabase{Detail: err.Error()}
 	}
+
 	return u, nil
 }
 
 func (d *userDatastore) FindByName(name string) (*model.User, error) {
 	u := &model.User{}
+
 	err := d.db.Where("user_name = ?", name).First(&u).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return nil, errors.ErrRecordNotFound{}
@@ -52,6 +57,7 @@ func (d *userDatastore) FindByName(name string) (*model.User, error) {
 	if err != nil {
 		return nil, errors.ErrDatabase{Detail: err.Error()}
 	}
+
 	return u, nil
 }
 
@@ -65,6 +71,7 @@ func (d *userDatastore) Update(user *model.User) error {
 
 func (d *userDatastore) Delete(id string) error {
 	user := model.User{}
+
 	err := d.db.
 		Model(&user).Where("user_id = ?", id).
 		Update("deleted_at", sql.NullTime{Time: clock.Now(), Valid: true}).Error
@@ -74,11 +81,13 @@ func (d *userDatastore) Delete(id string) error {
 	if err != nil {
 		return errors.ErrDatabase{Detail: err.Error()}
 	}
+
 	return nil
 }
 
 func (d *userDatastore) Restore(id string) error {
 	user := model.User{}
+
 	err := d.db.
 		Model(&user).Unscoped().Where("user_id = ?", id).
 		Update("deleted_at", sql.NullTime{Valid: false}).Error
@@ -88,5 +97,6 @@ func (d *userDatastore) Restore(id string) error {
 	if err != nil {
 		return errors.ErrDatabase{Detail: err.Error()}
 	}
+
 	return nil
 }

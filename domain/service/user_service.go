@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/jinzhu/gorm"
 	"github.com/taniwhy/ithub-backend/domain/repository"
 )
@@ -56,12 +54,10 @@ func (s *userService) IsExist(id string) (bool, error) {
 func (s *userService) IsDeleted(id string) (bool, error) {
 	res, err := s.userRepository.FindDeletedByID(id)
 	if res != nil && res.DeletedAt.Valid == true {
-		fmt.Println("test3")
 		return true, nil
 	}
 	if err != nil {
 		return false, err
 	}
-	fmt.Println("test4")
 	return false, nil
 }

@@ -1,18 +1,18 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/taniwhy/ithub-backend/domain/model"
 	"github.com/taniwhy/ithub-backend/domain/repository"
 	"github.com/taniwhy/ithub-backend/handler/json"
-	"github.com/taniwhy/ithub-backend/handler/util"
+	"github.com/taniwhy/ithub-backend/package/error"
+	"github.com/taniwhy/ithub-backend/package/response"
 	"gopkg.in/guregu/null.v3"
 )
 
-// ITagHandler :
+// ITagHandler : インターフェース
 type ITagHandler interface {
 	GetList(c *gin.Context)
 	Create(c *gin.Context)
@@ -32,10 +32,12 @@ func NewTagHandler(tR repository.ITagRepository) ITagHandler {
 func (h *tagHandler) GetList(c *gin.Context) {
 	tags, err := h.tagRepository.FindList()
 	if err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
+
 	res := []json.GetTagsResJSON{}
+
 	for _, t := range tags {
 		r := json.GetTagsResJSON{
 			TagID:     t.TagID,
@@ -45,23 +47,27 @@ func (h *tagHandler) GetList(c *gin.Context) {
 		}
 		res = append(res, r)
 	}
-	util.SuccessDataResponser(c, res)
+
+	response.Success(c, res)
 }
 
 func (h *tagHandler) Create(c *gin.Context) {
 	body := json.CreateTagReqJSON{}
+
 	if err := c.BindJSON(&body); err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
+
 	newTag := model.NewTag(body.TagName, body.TagIcon)
-	fmt.Println(newTag)
+
 	err := h.tagRepository.Insert(newTag)
 	if err != nil {
-		util.ErrorResponser(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
-	util.SuccessMessageResponser(c, "ok")
+
+	response.Success(c, nil)
 }
 
 func (h *tagHandler) Update(c *gin.Context) {
