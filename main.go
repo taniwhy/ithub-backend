@@ -1,15 +1,16 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"os"
+	"crypto/sha1"
+	"fmt"
+	"path/filepath"
 	"time"
 
-	"github.com/taniwhy/ithub-backend/db/dao"
-	"github.com/taniwhy/ithub-backend/router"
+	"github.com/gin-gonic/gin"
+	imgupload "github.com/olahol/go-imageupload"
 )
 
+/*
 func main() {
 	dbConn := dao.NewDatabase()
 	defer dbConn.Close()
@@ -27,4 +28,58 @@ func main() {
 		log.Fatal("Serve failed")
 		panic(err)
 	}
+
+	// Upload先のディレクトリ
+	//dstDir := "./public/images"
+
+	//router := gin.Default()
+
+	//routers.MaxMultipartMemory = 8 << 20
+
+	//routers.Static("/", "./views")
+	/*
+		routers.POST("/upload", func(c *gin.Context) {
+			img, err := imgupload.Process(c.Request, "file")
+			if err != nil {
+				panic(err)
+			}
+
+			thumb, err := imgupload.ThumbnailJPEG(img, 300, 300, 90)
+			if err != nil {
+				panic(err)
+			}
+
+			h := sha1.Sum(thumb.Data)
+			savepath := filepath.Join(dstDir, fmt.Sprintf("%s_%x.jpg", time.Now().Format("20060102150405"), h[:4]))
+			thumb.Save(savepath)
+		})
+
+}*/
+func main() {
+	// Upload先のディレクトリ
+	dstDir := "./public/images"
+
+	router := gin.Default()
+
+	router.MaxMultipartMemory = 8 << 20
+
+	router.Static("/", "./views")
+
+	router.POST("/upload", func(c *gin.Context) {
+		img, err := imgupload.Process(c.Request, "file")
+		if err != nil {
+			panic(err)
+		}
+
+		thumb, err := imgupload.ThumbnailJPEG(img, 300, 300, 90)
+		if err != nil {
+			panic(err)
+		}
+
+		h := sha1.Sum(thumb.Data)
+		savepath := filepath.Join(dstDir, fmt.Sprintf("%s_%x.jpg", time.Now().Format("20060102150405"), h[:4]))
+		thumb.Save(savepath)
+	})
+
+	router.Run(":8000")
 }
