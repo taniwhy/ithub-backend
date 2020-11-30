@@ -22,7 +22,7 @@ type Note struct {
 // NewNote : Noteテーブルのレコードモデル生成
 func NewNote(userID, noteTitle, noteText string) *Note {
 	return &Note{
-		NoteID:    uuid.UuID(),
+		NoteID:    uuid.New(),
 		UserID:    userID,
 		NoteTitle: noteTitle,
 		NoteText:  noteText,
