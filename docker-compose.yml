@@ -2,8 +2,8 @@ version: "3"
 services:
   app:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./build/Dockerfile
     container_name: "app"
     ports:
       - "8000:8000"
@@ -17,7 +17,7 @@ services:
     container_name: "db"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./db/init/:/docker-entrypoint-initdb.d
+      - ../db/init/:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     environment:

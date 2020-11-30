@@ -20,6 +20,19 @@
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"ms-vscode.go",
+		"coenraads.bracket-pair-colorizer-2",
+		"ms-azuretools.vscode-docker",
+		"mikestead.dotenv",
+		"golang.go",
+		"eamodio.gitlens",
+		"oderwat.indent-rainbow",
+		"ms-ceintl.vscode-language-pack-ja",
+		"pkief.material-icon-theme",
+		"ionutvmi.path-autocomplete",
+		"christian-kohler.path-intellisense",
+		"ms-vscode-remote.remote-containers",
+		"adpyke.vscode-sql-formatter",
+		"shardulm94.trailing-spaces"
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
@@ -33,4 +46,11 @@
 	// "postCreateCommand": "apt-get update && apt-get install -y curl",
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode"
+	"mounts": [
+		"source=${localEnv:HOME}/.ssh/,target=/root/.ssh/,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached",
+		"source=${localWorkspaceFolder}/.devcontainer/.local/share/fish/fish_history,target=/root/.local/share/fish/fish_history,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.config/gcloud/,target=/root/.config/gcloud/,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.kube/,target=/root/.kube/,type=bind,consistency=cached",
+	],
 }

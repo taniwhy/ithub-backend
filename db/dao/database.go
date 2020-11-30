@@ -2,7 +2,7 @@ package dao
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/taniwhy/ithub-backend/config"
+	"github.com/taniwhy/ithub-backend/configs"
 
 	// Postgres ドライバ
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -15,13 +15,15 @@ var (
 
 // NewDatabase :　データベースコネクションの確立
 func NewDatabase() *gorm.DB {
-	dsn := config.GetDatabaseConf()
+	dsn := configs.GetDatabaseConf()
 	if err != nil {
 		panic(err.Error())
 	}
+
 	conn, err = gorm.Open("postgres", dsn)
 	if err != nil {
 		panic(err.Error())
 	}
+
 	return conn
 }
