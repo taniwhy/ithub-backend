@@ -14,11 +14,6 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+web/images/*
+
 memo
-id_rsa.dev.pub
-id_rsa.dev
-ithub.code-workspace
-
-server
-
-public/images/*

@@ -11,6 +11,8 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/olahol/go-imageupload v0.0.0-20160503070439-09d2b92fa05e
+	golang.org/x/tools v0.0.0-20201125231158-b5590deeca9b // indirect
+	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/guregu/null.v3 v3.5.0
 )
