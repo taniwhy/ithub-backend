@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"crypto/sha1"
 	"fmt"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	imgupload "github.com/olahol/go-imageupload"
@@ -14,7 +16,6 @@ type IUploadHandler interface {
 }
 
 type uploadHandler struct {
-	name string
 }
 
 // NewUploadHandler : ハンドラの生成
@@ -23,25 +24,10 @@ func NewUploadHandler() IUploadHandler {
 }
 
 func (h *uploadHandler) UploadImage(c *gin.Context) {
-
-	/*
-		file, header, err := c.Request.FormFile("upload")
-		filename := header.Filename
-		fmt.Println(header.Filename)
-		out, err := os.Create("./tmp/" + filename + ".png")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer out.Close()
-		_, err = io.Copy(out, file)
-		if err != nil {
-			log.Fatal(err)
-		}
-	*/
-	dstDir := "./web/images"
+	dstDir := "./web/images/"
 	img, err := imgupload.Process(c.Request, "file")
 	if err != nil {
-		panic(err)
+		c.JSON(400, c.Request.Header.Get("Content-Type"))
 	}
 
 	thumb, err := imgupload.ThumbnailJPEG(img, 300, 300, 90)
@@ -49,7 +35,7 @@ func (h *uploadHandler) UploadImage(c *gin.Context) {
 		panic(err)
 	}
 
-	//s := sha1.Sum(thumb.Data)
-	savepath := filepath.Join(dstDir, fmt.Sprintf("" /*, time.Now().Format("20060102150405"), s[:4]*/))
+	s := sha1.Sum(thumb.Data)
+	savepath := filepath.Join(dstDir, fmt.Sprintf("%s_%x.jpg", time.Now().Format("20060102150405"), s[:4]))
 	thumb.Save(savepath)
 }
