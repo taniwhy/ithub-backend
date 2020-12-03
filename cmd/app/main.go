@@ -15,6 +15,7 @@ func main() {
 	defer dbConn.Close()
 
 	routers := router.Init(dbConn)
+	routers.MaxMultipartMemory = 8 << 20
 
 	server := &http.Server{
 		Addr:           ":" + os.Getenv("PORT"),

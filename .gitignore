@@ -17,8 +17,4 @@
 web/images/*.png
 
 memo
-go.mod
-go.sum
-id_rsa.dev
-id_rsa.dev.pub
-ithub.code-workspace
+
