@@ -44,22 +44,27 @@ func (h *userHandler) GetMe(c *gin.Context) {
 		return
 	}
 
-	userID := claims["sub"].(string)
-	user, err := h.userRepository.FindByID(userID)
+	ID := claims["sub"].(string)
+	user, err := h.userRepository.FindByID(ID)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
 		return
 	}
+	isyou := token == ID
 
 	response.Success(c, json.GetUserResJSON{
-		UserID:          user.UserID,
-		UserName:        null.NewString(user.UserName.String, user.UserName.Valid),
-		Name:            user.Name,
-		TwitterUsername: null.NewString(user.TwitterUsername.String, user.TwitterUsername.Valid),
-		GithubUsername:  null.NewString(user.TwitterUsername.String, user.GithubUsername.Valid),
-		UserText:        null.NewString(user.UserText.String, user.UserText.Valid),
-		UserIcon:        null.NewString(user.UserIcon.String, user.UserIcon.Valid),
-		CreatedAt:       user.CreatedAt,
+		ID:            user.ID,
+		UserID:        null.NewString(user.UserID.String, user.UserID.Valid),
+		Name:          user.Name,
+		TwitterLink:   null.NewString(user.TwitterLink.String, user.TwitterLink.Valid),
+		GithubLink:    null.NewString(user.TwitterLink.String, user.GithubLink.Valid),
+		UserText:      null.NewString(user.UserText.String, user.UserText.Valid),
+		UserIcon:      null.NewString(user.UserIcon.String, user.UserIcon.Valid),
+		CreatedAt:     user.CreatedAt,
+		FollowCount:   0,
+		FollowerCount: 0,
+		CommentCount:  0,
+		IsYou:         isyou,
 	})
 }
 
@@ -73,14 +78,17 @@ func (h *userHandler) GetByName(c *gin.Context) {
 	}
 
 	response.Success(c, json.GetUserResJSON{
-		UserID:          user.UserID,
-		UserName:        null.NewString(user.UserName.String, user.UserName.Valid),
-		Name:            user.Name,
-		TwitterUsername: null.NewString(user.TwitterUsername.String, user.TwitterUsername.Valid),
-		GithubUsername:  null.NewString(user.TwitterUsername.String, user.GithubUsername.Valid),
-		UserText:        null.NewString(user.UserText.String, user.UserText.Valid),
-		UserIcon:        null.NewString(user.UserIcon.String, user.UserIcon.Valid),
-		CreatedAt:       user.CreatedAt,
+		ID:            user.ID,
+		UserID:        null.NewString(user.UserID.String, user.UserID.Valid),
+		Name:          user.Name,
+		TwitterLink:   null.NewString(user.TwitterLink.String, user.TwitterLink.Valid),
+		GithubLink:    null.NewString(user.TwitterLink.String, user.GithubLink.Valid),
+		UserText:      null.NewString(user.UserText.String, user.UserText.Valid),
+		UserIcon:      null.NewString(user.UserIcon.String, user.UserIcon.Valid),
+		CreatedAt:     user.CreatedAt,
+		FollowCount:   0,
+		FollowerCount: 0,
+		CommentCount:  0,
 	})
 }
 
@@ -101,18 +109,18 @@ func (h *userHandler) Update(c *gin.Context) {
 		return
 	}
 
-	userID := claims["sub"].(string)
+	ID := claims["sub"].(string)
 
 	err = h.userRepository.Update(
 		&model.User{
-			UserID:          userID,
-			UserName:        sql.NullString{String: body.UserName, Valid: body.UserName != ""},
-			Name:            body.Name,
-			TwitterUsername: sql.NullString{String: body.TwitterUsername.String, Valid: body.TwitterUsername.String != ""},
-			GithubUsername:  sql.NullString{String: body.GithubUsername.String, Valid: body.GithubUsername.String != ""},
-			UserText:        sql.NullString{String: body.UserText.String, Valid: body.UserText.String != ""},
-			UserIcon:        sql.NullString{String: body.UserIcon.String, Valid: body.UserIcon.String != ""},
-			UpdatedAt:       clock.Now(),
+			ID:          ID,
+			UserID:      sql.NullString{String: body.UserID, Valid: body.UserID != ""},
+			Name:        body.Name,
+			TwitterLink: sql.NullString{String: body.TwitterLink.String, Valid: body.TwitterLink.String != ""},
+			GithubLink:  sql.NullString{String: body.GithubLink.String, Valid: body.GithubLink.String != ""},
+			UserText:    sql.NullString{String: body.UserText.String, Valid: body.UserText.String != ""},
+			UserIcon:    sql.NullString{String: body.UserIcon.String, Valid: body.UserIcon.String != ""},
+			UpdatedAt:   clock.Now(),
 		},
 	)
 	if err != nil {

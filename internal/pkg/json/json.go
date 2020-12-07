@@ -13,29 +13,33 @@ type LoginRequest struct {
 
 // GetUserResJSON :
 type GetUserResJSON struct {
-	UserID          string      `json:"user_id" binding:"required"`
-	UserName        null.String `json:"user_name" binding:"required"`
-	Name            string      `json:"name" binding:"required"`
-	TwitterUsername null.String `json:"twitter_username" binding:"required"`
-	GithubUsername  null.String `json:"github_username" binding:"required"`
-	UserText        null.String `json:"user_text" binding:"required"`
-	UserIcon        null.String `json:"user_icon" binding:"required"`
-	CreatedAt       time.Time   `json:"created_at" binding:"required"`
+	ID            string      `json:"id" binding:"required"`
+	UserID        null.String `json:"user_id" binding:"required"`
+	Name          string      `json:"name" binding:"required"`
+	TwitterLink   null.String `json:"twitter_link" binding:"required"`
+	GithubLink    null.String `json:"github_link" binding:"required"`
+	UserText      null.String `json:"user_text" binding:"required"`
+	UserIcon      null.String `json:"icon_link" binding:"required"`
+	CreatedAt     time.Time   `json:"created_at" binding:"required"`
+	FollowCount   int         `json:"follow_count" binding:"required"`
+	FollowerCount int         `json:"follower_counter" binding:"required"`
+	CommentCount  int         `json:"Comment_count" binding:"required"`
+	IsYou         bool        `json:"is_you" binding:"required"`
 }
 
 // UpdateUserReqJSON : ユーザー更新リクエストボディ
 type UpdateUserReqJSON struct {
-	UserName        string      `json:"user_name" binding:"required"`
-	Name            string      `json:"name" binding:"required"`
-	TwitterUsername null.String `json:"twitter_username" binding:"required"`
-	GithubUsername  null.String `json:"github_username" binding:"required"`
-	UserText        null.String `json:"user_text" binding:"required"`
-	UserIcon        null.String `json:"user_icon" binding:"required"`
+	UserID      string      `json:"user_id" binding:"required"`
+	Name        string      `json:"name" binding:"required"`
+	TwitterLink null.String `json:"twitter_link" binding:"required"`
+	GithubLink  null.String `json:"github_link" binding:"required"`
+	UserText    null.String `json:"user_text" binding:"required"`
+	UserIcon    null.String `json:"user_icon" binding:"required"`
 }
 
 // GetNoteResJSON :
 type GetNoteResJSON struct {
-	NoteID    string    `json:"user_id" binding:"required"`
+	NoteID    string    `json:"note_id" binding:"required"`
 	UserName  string    `json:"user_name" binding:"required"`
 	NoteTitle string    `json:"note_title" binding:"required"`
 	NoteText  string    `json:"note_text" binding:"required"`

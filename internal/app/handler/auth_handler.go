@@ -116,7 +116,7 @@ func (h *authHandler) Login(c *gin.Context) {
 		return
 	}
 
-	accessToken := auth.GenerateAccessToken(u.UserID, u.UserName.String, u.IsAdmin)
+	accessToken := auth.GenerateAccessToken(u.ID, u.UserID.String, u.IsAdmin)
 
 	session := sessions.Default(c)
 	session.Set("_token", accessToken)

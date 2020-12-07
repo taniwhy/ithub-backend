@@ -9,34 +9,42 @@ import (
 
 // User :
 type User struct {
-	UserID          string
-	UserName        sql.NullString
-	Name            string
-	TwitterUsername sql.NullString
-	GithubUsername  sql.NullString
-	UserText        sql.NullString
-	UserIcon        sql.NullString
-	Email           string
-	IsAdmin         bool
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	DeletedAt       sql.NullTime
+	ID            string
+	UserID        sql.NullString
+	Name          string
+	TwitterLink   sql.NullString
+	GithubLink    sql.NullString
+	UserText      sql.NullString
+	UserIcon      sql.NullString
+	Email         string
+	IsAdmin       bool
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	DeletedAt     sql.NullTime
+	FollowCount   int
+	FollowerCount int
+	CommentCount  int
+	IsYou         bool
 }
 
 // NewUser : userテーブルのレコードモデル生成
 func NewUser(gID, name, icon, email string) *User {
 	return &User{
-		UserID:          gID,
-		UserName:        sql.NullString{String: "", Valid: false},
-		Name:            name,
-		TwitterUsername: sql.NullString{String: "", Valid: false},
-		GithubUsername:  sql.NullString{String: "", Valid: false},
-		UserText:        sql.NullString{String: "", Valid: false},
-		UserIcon:        sql.NullString{String: icon, Valid: true},
-		Email:           email,
-		IsAdmin:         false,
-		CreatedAt:       clock.Now(),
-		UpdatedAt:       clock.Now(),
-		DeletedAt:       sql.NullTime{Valid: false},
+		ID:            gID,
+		UserID:        sql.NullString{String: "", Valid: false},
+		Name:          name,
+		TwitterLink:   sql.NullString{String: "", Valid: false},
+		GithubLink:    sql.NullString{String: "", Valid: false},
+		UserText:      sql.NullString{String: "", Valid: false},
+		UserIcon:      sql.NullString{String: icon, Valid: true},
+		Email:         email,
+		IsAdmin:       false,
+		CreatedAt:     clock.Now(),
+		UpdatedAt:     clock.Now(),
+		DeletedAt:     sql.NullTime{Valid: false},
+		FollowCount:   0,
+		FollowerCount: 0,
+		CommentCount:  0,
+		IsYou:         false,
 	}
 }

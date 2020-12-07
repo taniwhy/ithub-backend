@@ -3,11 +3,14 @@ package handler
 import (
 	"crypto/sha1"
 	"fmt"
+	"net/http"
 	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	imgupload "github.com/olahol/go-imageupload"
+	"github.com/taniwhy/ithub-backend/internal/pkg/error"
+	"github.com/taniwhy/ithub-backend/internal/pkg/response"
 )
 
 // IUploadHandler : インターフェース
@@ -27,12 +30,14 @@ func (h *uploadHandler) UploadImage(c *gin.Context) {
 	dstDir := "./web/images/"
 	img, err := imgupload.Process(c.Request, "file")
 	if err != nil {
-		c.JSON(400, c.Request.Header.Get("Content-Type"))
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
+		return
 	}
 
 	thumb, err := imgupload.ThumbnailJPEG(img, 300, 300, 90)
 	if err != nil {
-		panic(err)
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
+		return
 	}
 
 	s := sha1.Sum(thumb.Data)
