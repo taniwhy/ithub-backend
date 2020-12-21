@@ -16,7 +16,7 @@ RUN npm install -g aglio --unsafe-perm
 RUN mkdir -p /go/src/github.com/taniwhy/ithub-backend
 WORKDIR /go/src/github.com/taniwhy/ithub-backend
 
-ADD ./ /go/src/github.com/taniwhy/ithub-backend
+COPY ./ ./
 
 RUN go get github.com/rubenv/sql-migrate/...
 
