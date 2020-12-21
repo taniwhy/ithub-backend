@@ -22,5 +22,5 @@ RUN go get github.com/rubenv/sql-migrate/...
 
 EXPOSE 8000
 
-CMD make run
+CMD go run ./cmd/app/main.go
 
