@@ -9,6 +9,8 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
+	github.com/koffeinsource/go-imgur v0.3.0
+	github.com/koffeinsource/go-klogger v0.1.1
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/olahol/go-imageupload v0.0.0-20160503070439-09d2b92fa05e
 	golang.org/x/tools v0.0.0-20201125231158-b5590deeca9b // indirect
