@@ -53,6 +53,9 @@ func (s *userService) IsExist(id string) (bool, error) {
 // ユーザーが削除済みであればtrueを返却
 func (s *userService) IsDeleted(id string) (bool, error) {
 	res, err := s.userRepository.FindDeletedByID(id)
+	if gorm.IsRecordNotFoundError(err) {
+		return false, nil
+	}
 	if res != nil && res.DeletedAt.Valid == true {
 		return true, nil
 	}
