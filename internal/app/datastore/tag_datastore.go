@@ -30,6 +30,20 @@ func (d *tagDatastore) FindList() ([]*model.Tag, error) {
 	return t, nil
 }
 
+func (d *tagDatastore) FindByName(name string) (*model.Tag, error) {
+	t := model.Tag{}
+
+	err := d.db.Where("tag_name = ?", name).First(&t).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errors.ErrDatabase{Detail: err.Error()}
+	}
+
+	return &t, nil
+}
+
 func (d *tagDatastore) Insert(tag *model.Tag) error {
 	return d.db.Create(tag).Error
 }

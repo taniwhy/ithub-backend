@@ -11,8 +11,8 @@ import (
 // Comment :
 type Comment struct {
 	CommentID string
+	UserName  string
 	NoteID    string
-	UserID    string
 	Comment   string
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -20,10 +20,10 @@ type Comment struct {
 }
 
 // NewComment : Commentテーブルのレコードモデル生成
-func NewComment(userID, noteID, comment string) *Comment {
+func NewComment(UserName, noteID, comment string) *Comment {
 	return &Comment{
 		CommentID: uuid.New(),
-		UserID:    userID,
+		UserName:  UserName,
 		NoteID:    noteID,
 		Comment:   comment,
 		CreatedAt: clock.Now(),

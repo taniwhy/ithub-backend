@@ -9,7 +9,6 @@ import (
 	"github.com/taniwhy/ithub-backend/internal/pkg/error"
 	"github.com/taniwhy/ithub-backend/internal/pkg/json"
 	"github.com/taniwhy/ithub-backend/internal/pkg/response"
-	"gopkg.in/guregu/null.v3"
 )
 
 // ITagHandler : インターフェース
@@ -29,6 +28,11 @@ func NewTagHandler(tR repository.ITagRepository) ITagHandler {
 	return &tagHandler{tagRepository: tR}
 }
 
+type getTagsResponse struct {
+	ID   string `json:"id" binding:"required"`
+	Name string `json:"name" binding:"required"`
+}
+
 func (h *tagHandler) GetList(c *gin.Context) {
 	tags, err := h.tagRepository.FindList()
 	if err != nil {
@@ -36,14 +40,12 @@ func (h *tagHandler) GetList(c *gin.Context) {
 		return
 	}
 
-	res := []json.GetTagsResJSON{}
+	res := []getTagsResponse{}
 
 	for _, t := range tags {
-		r := json.GetTagsResJSON{
-			TagID:     t.TagID,
-			TagName:   t.TagName,
-			TagIcon:   null.NewString(t.TagIcon.String, t.TagIcon.Valid),
-			CreatedAt: t.CreatedAt,
+		r := getTagsResponse{
+			ID:   t.TagID,
+			Name: t.TagName,
 		}
 		res = append(res, r)
 	}
@@ -59,7 +61,7 @@ func (h *tagHandler) Create(c *gin.Context) {
 		return
 	}
 
-	newTag := model.NewTag(body.TagName, body.TagIcon)
+	newTag := model.NewTag(body.TagName)
 
 	err := h.tagRepository.Insert(newTag)
 	if err != nil {

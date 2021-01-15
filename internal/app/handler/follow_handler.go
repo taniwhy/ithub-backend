@@ -10,6 +10,7 @@ import (
 	"github.com/taniwhy/ithub-backend/internal/app/middleware/auth"
 	"github.com/taniwhy/ithub-backend/internal/pkg/error"
 	"github.com/taniwhy/ithub-backend/internal/pkg/response"
+	"gopkg.in/guregu/null.v3"
 )
 
 // IFollowHandler :
@@ -22,11 +23,19 @@ type IFollowHandler interface {
 
 type followHandler struct {
 	followRepository repository.IFollowRepository
+	userRepository   repository.IUserRepository
 }
 
 // NewFollowHandler : フォローハンドラの生成
-func NewFollowHandler(fR repository.IFollowRepository) IFollowHandler {
-	return &followHandler{followRepository: fR}
+func NewFollowHandler(fR repository.IFollowRepository, uR repository.IUserRepository) IFollowHandler {
+	return &followHandler{followRepository: fR, userRepository: uR}
+}
+
+type getFollowResponse struct {
+	ID     string      `json:"id" binding:"required"`
+	UserID null.String `json:"user_id" binding:"required"`
+	Name   string      `json:"name" binding:"required"`
+	Link   null.String `json:"icon_link" binding:"required"`
 }
 
 func (h *followHandler) GetFollows(c *gin.Context) {
@@ -38,7 +47,26 @@ func (h *followHandler) GetFollows(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, follows)
+	followUsers := []getFollowResponse{}
+
+	for _, f := range follows {
+
+		user, err := h.userRepository.FindByName(f.FollowUserName)
+		if err != nil {
+			response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
+			return
+		}
+
+		u := getFollowResponse{
+			ID:     user.UserID,
+			UserID: null.NewString(user.UserName.String, user.UserName.Valid),
+			Name:   user.Name,
+			Link:   null.NewString(user.UserIcon.String, user.UserIcon.Valid),
+		}
+		followUsers = append(followUsers, u)
+	}
+
+	response.Success(c, followUsers)
 }
 
 func (h *followHandler) GetFollowers(c *gin.Context) {
@@ -50,12 +78,31 @@ func (h *followHandler) GetFollowers(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, followers)
+	followUsers := []getFollowResponse{}
+
+	for _, f := range followers {
+
+		user, err := h.userRepository.FindByName(f.UserName)
+		if err != nil {
+			response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
+			return
+		}
+
+		u := getFollowResponse{
+			ID:     user.UserID,
+			UserID: null.NewString(user.UserName.String, user.UserName.Valid),
+			Name:   user.Name,
+			Link:   null.NewString(user.UserIcon.String, user.UserIcon.Valid),
+		}
+		followUsers = append(followUsers, u)
+	}
+
+	response.Success(c, followUsers)
 }
 
 func (h *followHandler) Create(c *gin.Context) {
 	session := sessions.Default(c)
-	token := session.Get("token").(string)
+	token := session.Get("_token").(string)
 
 	claims, err := auth.GetTokenClaimsFromToken(token)
 	if err != nil {
@@ -65,6 +112,16 @@ func (h *followHandler) Create(c *gin.Context) {
 
 	userName := claims["user_name"].(string)
 	target := c.Query("target")
+
+	if target == "" {
+		response.Error(c, http.StatusBadRequest, error.ERROR, "target is required")
+		return
+	}
+
+	if userName == target {
+		response.Error(c, http.StatusBadRequest, error.ERROR, "error")
+		return
+	}
 
 	newFollow := model.NewFollow(userName, target)
 	if err := h.followRepository.Insert(newFollow); err != nil {
@@ -77,7 +134,7 @@ func (h *followHandler) Create(c *gin.Context) {
 
 func (h *followHandler) Delete(c *gin.Context) {
 	session := sessions.Default(c)
-	token := session.Get("token").(string)
+	token := session.Get("_token").(string)
 
 	claims, err := auth.GetTokenClaimsFromToken(token)
 	if err != nil {

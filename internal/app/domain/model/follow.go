@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/taniwhy/ithub-backend/internal/pkg/util/clock"
@@ -14,8 +13,6 @@ type Follow struct {
 	UserName       string
 	FollowUserName string
 	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	DeletedAt      sql.NullTime
 }
 
 // NewFollow : Tagテーブルのレコードモデル生成
@@ -25,7 +22,5 @@ func NewFollow(userName, followUserName string) *Follow {
 		UserName:       userName,
 		FollowUserName: followUserName,
 		CreatedAt:      clock.Now(),
-		UpdatedAt:      clock.Now(),
-		DeletedAt:      sql.NullTime{Valid: false},
 	}
 }

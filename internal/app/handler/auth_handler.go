@@ -21,6 +21,7 @@ const googleURL string = "https://www.googleapis.com/oauth2/v1/userinfo"
 
 // IAuthHandler : インターフェース
 type IAuthHandler interface {
+	Reflesh(c *gin.Context)
 	Login(c *gin.Context)
 	Logout(c *gin.Context)
 }
@@ -37,6 +38,32 @@ func NewAuthHandler(uR repository.IUserRepository, uS service.IUserService) IAut
 		userRepository: uR, userService: uS,
 		validate: validator.New(),
 	}
+}
+
+func (h *authHandler) Reflesh(c *gin.Context) {
+	session := sessions.Default(c)
+	token := session.Get("_token").(string)
+
+	claims, err := auth.GetTokenClaimsFromToken(token)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
+		return
+	}
+
+	id := claims["sub"].(string)
+
+	u, err := h.userRepository.FindByID(id)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, error.ERROR, err.Error())
+		return
+	}
+
+	accessToken := auth.GenerateAccessToken(u.UserID, u.UserName.String, u.IsAdmin)
+
+	session.Set("_token", accessToken)
+	session.Save()
+
+	response.Success(c, nil)
 }
 
 func (h *authHandler) Login(c *gin.Context) {
