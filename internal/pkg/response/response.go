@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/taniwhy/ithub-backend/internal/pkg/error"
 )
 
 type successResponse struct {
@@ -27,15 +26,10 @@ type errorResponse struct {
 // Success : レスポンス生成とレスポンス実行
 func Success(c *gin.Context, data interface{}) {
 	if data != nil {
-		c.JSON(http.StatusOK, successResponse{
-			Code:   error.SUCCESS,
-			Status: http.StatusText(http.StatusOK),
-			Data:   data,
-		})
+		c.JSON(http.StatusOK, data)
 		return
 	}
 	c.JSON(http.StatusOK, successMsgResponse{
-		Code:   error.SUCCESS,
 		Status: http.StatusText(http.StatusOK),
 	})
 	return

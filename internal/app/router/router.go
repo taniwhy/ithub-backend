@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -21,57 +22,68 @@ import (
 
 // Init : Init関数は依存性の注入とURLパスルーティングを行います
 func Init(dbConn *gorm.DB) *gin.Engine {
-
 	userDatastore := datastore.NewUserDatastore(dbConn)
+	noteDatastore := datastore.NewNoteDatastore(dbConn)
 	tagDatastore := datastore.NewTagDatastore(dbConn)
+	noteTagDatastore := datastore.NewnNoteTagDatastore(dbConn)
+	followDatastore := datastore.NewFollowDatastore(dbConn)
+	commentDatastore := datastore.NewCommentDatastore(dbConn)
+
 	userService := service.NewUserService(userDatastore)
+
 	authHandler := handler.NewAuthHandler(userDatastore, userService)
-	userHandler := handler.NewUserHandler(userDatastore)
+	userHandler := handler.NewUserHandler(userDatastore, followDatastore, noteDatastore)
+	noteHandler := handler.NewNoteHandler(noteDatastore, userDatastore, tagDatastore, noteTagDatastore)
 	tagHandler := handler.NewTagHandler(tagDatastore)
+	followHandler := handler.NewFollowHandler(followDatastore, userDatastore)
+	commentHandler := handler.NewCommentHandler(commentDatastore, userDatastore)
 
 	dbConn.LogMode(true)
 
 	r := gin.Default()
+
 	store := cookie.NewStore([]byte(configs.SecretKey))
-	r.Use(sessions.Sessions("_session", store))
-	r.Use(cors.Write())
 
-	var test string
-
-	type body struct {
-		Mark string `json:"mark" validate:"required"`
+	if os.Getenv("GO_ENV") != "dev" {
+		store.Options(sessions.Options{SameSite: http.SameSiteNoneMode, Secure: true})
 	}
 
-	r.GET("", func(c *gin.Context) {
-		c.JSON(200, test)
-	})
-
-	r.POST("", func(c *gin.Context) {
-		body := body{}
-		_ = c.Bind(&body)
-		test = body.Mark
-		c.JSON(200, gin.H{
-			"message": test,
-		})
-	})
+	r.Use(sessions.Sessions("_session", store))
+	r.Use(cors.Write())
 
 	v1 := r.Group("/v1")
 	auth := v1.Group("/auth")
 	users := v1.Group("/users")
+	notes := v1.Group("/notes")
 	tags := v1.Group("/tags")
+	follows := v1.Group("/follows")
+	comments := notes.Group("/:id/comments")
 	static := r.Group("static")
 	images := static.Group("/images")
 	{
+		auth.GET("/reflesh", authHandler.Reflesh)
 		auth.POST("/google/login", authHandler.Login)
 		auth.DELETE("/logout", authHandler.Logout)
 
 		v1.GET("/me", userHandler.GetMe)
 		users.GET("/:name", userHandler.GetByName)
-		users.PUT("/", userHandler.Update)
-		users.DELETE("/", userHandler.Delete)
+		users.PUT("", userHandler.Update)
+		users.DELETE("", userHandler.Delete)
 
-		tags.GET("/", tagHandler.GetList)
-		tags.POST("/", tagHandler.Create)
+		users.GET("/:name/notes", noteHandler.GetListByID)
+		notes.GET("/:id", noteHandler.GetByID)
+		notes.POST("", noteHandler.Create)
+
+		comments.GET("", commentHandler.GetByNoteID)
+		comments.POST("", commentHandler.Create)
+
+		users.GET("/:name/follows", followHandler.GetFollows)
+		users.GET("/:name/followers", followHandler.GetFollowers)
+		follows.GET("", followHandler.Create)
+		follows.GET("/delete", followHandler.Delete)
+
+		tags.GET("", tagHandler.GetList)
+		tags.POST("", tagHandler.Create)
 
 		images.POST("/upload", func(c *gin.Context) {
 			file, _ := c.FormFile("image")

@@ -10,18 +10,15 @@ import (
 // NoteTag :
 type NoteTag struct {
 	NoteID    string
-	TagID     string
 	TagName   string
-	IsMain    bool
 	CreatedAt time.Time
 }
 
 // NewNoteTag : NoteTagテーブルのレコードモデル生成
-func NewNoteTag(noteID, tagID string, isMain bool) *NoteTag {
+func NewNoteTag(noteID, tagName string) *NoteTag {
 	return &NoteTag{
 		NoteID:    noteID,
-		TagID:     tagID,
-		IsMain:    isMain,
+		TagName:   tagName,
 		CreatedAt: clock.Now(),
 	}
 }

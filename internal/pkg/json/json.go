@@ -11,16 +11,20 @@ type LoginRequest struct {
 	IDToken string `json:"id_token" validate:"required"`
 }
 
+
 // GetUserResJSON :
 type GetUserResJSON struct {
-	UserID          string      `json:"user_id" binding:"required"`
-	UserName        null.String `json:"user_name" binding:"required"`
-	Name            string      `json:"name" binding:"required"`
-	TwitterUsername null.String `json:"twitter_username" binding:"required"`
-	GithubUsername  null.String `json:"github_username" binding:"required"`
-	UserText        null.String `json:"user_text" binding:"required"`
-	UserIcon        null.String `json:"user_icon" binding:"required"`
-	CreatedAt       time.Time   `json:"created_at" binding:"required"`
+	UserID          null.String      `json:"user_id" binding:"required"`
+	Name            string           `json:"name" binding:"required"`
+	IconLink        null.String      `json:"icon_link" binding:"required"`
+	GithubUsername  null.String      `json:"github_link" binding:"required"`
+	TwitterUsername null.String      `json:"twitter_link" binding:"required"`
+	UserText        null.String      `json:"user_text" binding:"required"`
+	FollowCount     int              `json:"follow_count" binding:"required"`
+	FollowerCount   int              `json:"follower_count" binding:"required"`
+	FollowTags      []GetTagsResJSON `json:"follow_tags" binding:"required"`
+	IsYou           bool             `json:"is_you" binding:"required"`
+	CreatedAt       time.Time        `json:"created_at" binding:"required"`
 }
 
 // UpdateUserReqJSON : ユーザー更新リクエストボディ

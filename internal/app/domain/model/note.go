@@ -11,7 +11,7 @@ import (
 // Note :
 type Note struct {
 	NoteID    string
-	UserID    string
+	UserName  string
 	NoteTitle string
 	NoteText  string
 	CreatedAt time.Time
@@ -20,10 +20,10 @@ type Note struct {
 }
 
 // NewNote : Noteテーブルのレコードモデル生成
-func NewNote(userID, noteTitle, noteText string) *Note {
+func NewNote(UserName, noteTitle, noteText string) *Note {
 	return &Note{
 		NoteID:    uuid.New(),
-		UserID:    userID,
+		UserName:  UserName,
 		NoteTitle: noteTitle,
 		NoteText:  noteText,
 		CreatedAt: clock.Now(),

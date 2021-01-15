@@ -1,7 +1,7 @@
 -- +migrate Up
 CREATE TABLE IF NOT EXISTS users (
     user_id TEXT NOT NULL,
-    user_name TEXT,
+    user_name TEXT UNIQUE,
     name TEXT NOT NULL,
     twitter_username TEXT,
     github_username TEXT,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
     PRIMARY KEY(user_id),
-    UNIQUE(email)
+    UNIQUE(email, user_name)
 );
 
 -- +migrate Down

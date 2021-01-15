@@ -1,2 +1,2 @@
-release: sql-migrate up
-web: sql-migrate up
+release: sql-migrate up -env="production"
+web: sql-migrate up -env="production"
